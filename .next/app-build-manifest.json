@@ -22,6 +22,13 @@
       "static/chunks/main-app-e1c45743564468b6.js",
       "static/css/d41d007831377378.css",
       "static/chunks/app/page-2f5c92e8ad281fdf.js"
+    ],
+    "/update/page": [
+      "static/chunks/webpack-884884999d54b149.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-98a0bdaa30757bda.js",
+      "static/chunks/main-app-e1c45743564468b6.js",
+      "static/chunks/app/update/page-dad991f9cc4cddce.js"
     ]
   }
 }
