@@ -1,0 +1,4492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopWave — Everything, Delivered</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Dancing+Script:wght@700&family=Space+Mono:wght@700&family=Bebas+Neue&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --primary: #FF6B00;
+      --primary-dark: #cc5500;
+      --primary-light: #fff3e8;
+      --navy: #0d1117;
+      --navy2: #161b22;
+      --navy3: #21262d;
+      --bg: #f0f2f5;
+      --white: #fff;
+      --surface: #f6f8fa;
+      --text: #0d1117;
+      --text2: #57606a;
+      --text3: #8c959f;
+      --border: #d0d7de;
+      --border2: #eaeef2;
+      --red: #cf222e;
+      --green: #1a7f37;
+      --blue: #0969da;
+      --purple: #7c3aed;
+      --purple-dark: #5b21b6;
+      --purple-light: #f3f0ff;
+      --purple-border: #c4b5fd;
+      --gold: #FFD700;
+      --silver: #C0C0C0;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --radius-lg: 18px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 0 0 1px rgba(0, 0, 0, .05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, .1);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, .15);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: hidden
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy);
+      color: #fff;
+      padding: 13px 20px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(90px);
+      opacity: 0;
+      transition: all .35s cubic-bezier(.34, 1.56, .64, 1);
+      pointer-events: none;
+      max-width: 320px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      backdrop-filter: blur(4px)
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      box-shadow: var(--shadow-lg)
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, .08);
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text2);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: .2s
+    }
+
+    .modal-close:hover {
+      background: rgba(0, 0, 0, .14);
+      color: var(--text)
+    }
+
+    /* ══════════════════════════════════════════
+   ENGRAVING STUDIO MODAL — FLAGSHIP FEATURE
+══════════════════════════════════════════ */
+    .eng-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      backdrop-filter: blur(8px)
+    }
+
+    .eng-overlay.open {
+      display: flex
+    }
+
+    .eng-studio {
+      background: #0a0a0f;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 980px;
+      max-height: 96vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 32px 80px rgba(0, 0, 0, .8);
+      position: relative
+    }
+
+    /* Studio header */
+    .eng-studio-header {
+      background: linear-gradient(135deg, #1a0533 0%, #0d1117 50%, #001a33 100%);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      flex-shrink: 0
+    }
+
+    .eng-studio-header .studio-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0
+    }
+
+    .eng-studio-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: #fff;
+      font-weight: 700
+    }
+
+    .eng-studio-header p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .5);
+      margin-top: 1px
+    }
+
+    .eng-studio-header .close-studio {
+      margin-left: auto;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, .7);
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .eng-studio-header .close-studio:hover {
+      background: rgba(255, 255, 255, .15);
+      color: #fff
+    }
+
+    /* Studio body — 3 columns */
+    .eng-studio-body {
+      display: grid;
+      grid-template-columns: 260px 1fr 240px;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden
+    }
+
+    @media(max-width:800px) {
+      .eng-studio-body {
+        grid-template-columns: 1fr;
+        overflow-y: auto
+      }
+    }
+
+    /* Left panel — controls */
+    .eng-panel-left {
+      background: #0f0f1a;
+      border-right: 1px solid rgba(255, 255, 255, .07);
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .eng-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .35);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px
+    }
+
+    /* Text input */
+    .eng-text-input {
+      width: 100%;
+      background: rgba(255, 255, 255, .06);
+      border: 1.5px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      padding: 11px 13px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      transition: .2s;
+      letter-spacing: .5px
+    }
+
+    .eng-text-input:focus {
+      outline: none;
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, .1);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, .15)
+    }
+
+    .eng-text-input::placeholder {
+      color: rgba(255, 255, 255, .25);
+      font-weight: 400
+    }
+
+    .char-tracker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px
+    }
+
+    .char-bar {
+      flex: 1;
+      height: 2px;
+      background: rgba(255, 255, 255, .1);
+      border-radius: 1px;
+      margin-right: 8px;
+      overflow: hidden
+    }
+
+    .char-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #3b82f6);
+      border-radius: 1px;
+      transition: .3s
+    }
+
+    .char-count {
+      font-size: 10px;
+      color: rgba(255, 255, 255, .35)
+    }
+
+    /* Font style grid */
+    .font-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px
+    }
+
+    .font-opt {
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center
+    }
+
+    .font-opt:hover {
+      border-color: rgba(124, 58, 237, .5);
+      background: rgba(124, 58, 237, .08)
+    }
+
+    .font-opt.sel {
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, .15)
+    }
+
+    .font-opt .fn {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .6);
+      margin-bottom: 3px
+    }
+
+    .font-opt .fs {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .9)
+    }
+
+    /* Size slider */
+    .eng-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .12);
+      outline: none;
+      cursor: pointer
+    }
+
+    .eng-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, .5)
+    }
+
+    .size-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px
+    }
+
+    .size-label {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .7)
+    }
+
+    .size-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #a78bfa
+    }
+
+    /* Color palette */
+    .color-palette {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap
+    }
+
+    .clr {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: .2s;
+      position: relative
+    }
+
+    .clr.sel {
+      border-color: #fff;
+      transform: scale(1.12)
+    }
+
+    .clr.sel::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #000
+    }
+
+    .clr[data-c="#FFD700"].sel::after,
+    .clr[data-c="#ffffff"].sel::after,
+    .clr[data-c="#C0C0C0"].sel::after {
+      color: #000
+    }
+
+    .clr[data-c="#1a1a1a"].sel::after,
+    .clr[data-c="#7c3aed"].sel::after,
+    .clr[data-c="#0ea5e9"].sel::after,
+    .clr[data-c="#ef4444"].sel::after,
+    .clr[data-c="#10b981"].sel::after {
+      color: #fff
+    }
+
+    /* Opacity */
+    .opacity-row {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .opacity-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #a78bfa;
+      min-width: 32px
+    }
+
+    /* Effects toggles */
+    .effect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px
+    }
+
+    .effect-opt {
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .effect-opt:hover {
+      border-color: rgba(124, 58, 237, .5);
+      color: rgba(255, 255, 255, .8)
+    }
+
+    .effect-opt.sel {
+      border-color: #7c3aed;
+      background: rgba(124, 58, 237, .15);
+      color: #c4b5fd
+    }
+
+    .effect-opt .ei {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 3px
+    }
+
+    /* Center panel — canvas */
+    .eng-panel-center {
+      background: #111118;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .eng-canvas-wrap {
+      position: relative;
+      cursor: crosshair;
+      user-select: none
+    }
+
+    #eng-canvas {
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 20px 60px rgba(0, 0, 0, .8)
+    }
+
+    .eng-canvas-hint {
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: rgba(255, 255, 255, .3);
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .eng-canvas-hint span {
+      color: #a78bfa
+    }
+
+    /* Drag handle overlay */
+    .drag-handle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10
+    }
+
+    .drag-handle-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, .3), 0 0 12px rgba(124, 58, 237, .8);
+      cursor: move;
+      pointer-events: all;
+      transform: translate(-50%, -50%)
+    }
+
+    /* Perspective toggle */
+    .view-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px
+    }
+
+    .view-btn {
+      background: rgba(255, 255, 255, .06);
+      border: 1.5px solid rgba(255, 255, 255, .1);
+      border-radius: 20px;
+      color: rgba(255, 255, 255, .5);
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .view-btn.sel {
+      background: rgba(124, 58, 237, .2);
+      border-color: #7c3aed;
+      color: #c4b5fd
+    }
+
+    .view-btn:hover {
+      border-color: rgba(124, 58, 237, .5);
+      color: rgba(255, 255, 255, .8)
+    }
+
+    /* Right panel — preview & price */
+    .eng-panel-right {
+      background: #0c0c16;
+      border-left: 1px solid rgba(255, 255, 255, .07);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto
+    }
+
+    /* Compare cards */
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .cmp-card {
+      border-radius: 10px;
+      overflow: hidden;
+      background: #111118;
+      border: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .cmp-canvas-wrap canvas {
+      width: 100%;
+      display: block
+    }
+
+    .cmp-label {
+      padding: 6px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: rgba(255, 255, 255, .4)
+    }
+
+    .cmp-card.after .cmp-label {
+      color: #a78bfa;
+      background: rgba(124, 58, 237, .12)
+    }
+
+    /* Price breakdown */
+    .price-breakdown {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 14px
+    }
+
+    .pb-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      padding: 4px 0;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .pb-row.eng {
+      color: #a78bfa;
+      font-weight: 700
+    }
+
+    .pb-row.tot {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      margin-top: 6px;
+      padding-top: 10px
+    }
+
+    .pb-badge {
+      font-size: 9px;
+      background: rgba(26, 127, 55, .2);
+      color: #3fb950;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 700
+    }
+
+    /* Add to cart button */
+    .eng-add-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s;
+      letter-spacing: .3px
+    }
+
+    .eng-add-btn:hover {
+      opacity: .9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .4)
+    }
+
+    .eng-cancel-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .5);
+      cursor: pointer;
+      transition: .2s;
+      margin-top: 6px
+    }
+
+    .eng-cancel-btn:hover {
+      background: rgba(255, 255, 255, .1);
+      color: rgba(255, 255, 255, .8)
+    }
+
+    /* Realistic engraving glow badge */
+    .realistic-badge {
+      background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(59, 130, 246, .15));
+      border: 1px solid rgba(124, 58, 237, .3);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .realistic-badge strong {
+      display: block;
+      color: #a78bfa;
+      font-size: 11px;
+      margin-bottom: 2px
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, .3)
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      max-width: 1440px;
+      margin: 0 auto
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      letter-spacing: 2px
+    }
+
+    .logo span {
+      color: var(--primary)
+    }
+
+    .search-bar {
+      flex: 1;
+      display: flex;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      height: 42px;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, .06)
+    }
+
+    #search-category {
+      background: #161b22;
+      border: none;
+      padding: 0 12px;
+      font-size: 12px;
+      color: #ccc;
+      cursor: pointer;
+      border-right: 1px solid rgba(255, 255, 255, .08);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500
+    }
+
+    #search-input {
+      flex: 1;
+      border: none;
+      padding: 0 16px;
+      font-size: 14px;
+      outline: none;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      background: #fff
+    }
+
+    .search-btn {
+      background: var(--primary);
+      border: none;
+      width: 46px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .2s
+    }
+
+    .search-btn:hover {
+      background: var(--primary-dark)
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .hbtn {
+      background: none;
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      padding: 6px 11px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      transition: .15s;
+      text-align: left;
+      line-height: 1.3;
+      white-space: nowrap
+    }
+
+    .hbtn:hover {
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .hbtn .small {
+      display: block;
+      font-size: 10px;
+      color: #aaa
+    }
+
+    .hbtn .big {
+      font-weight: 700;
+      font-size: 13px
+    }
+
+    .cart-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px
+    }
+
+    .cart-count {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 11px;
+      border-radius: 10px;
+      padding: 1px 6px;
+      min-width: 20px;
+      text-align: center;
+      line-height: 18px
+    }
+
+    .header-bottom {
+      background: var(--navy2);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      overflow-x: auto;
+      border-top: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, .75);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: .15s;
+      letter-spacing: .3px
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #fff;
+      border-bottom-color: var(--primary)
+    }
+
+    /* ── PAGES ── */
+    .page {
+      display: none
+    }
+
+    .page.active {
+      display: block
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a0d2e 100%);
+      color: #fff;
+      padding: 70px 24px;
+      text-align: center;
+      overflow: hidden
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, .12) 0%, transparent 70%)
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124, 58, 237, .5), rgba(59, 130, 246, .5), transparent)
+    }
+
+    .hero-inner {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(124, 58, 237, .15);
+      border: 1px solid rgba(124, 58, 237, .3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #c4b5fd;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      margin-bottom: 18px
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      font-weight: 900
+    }
+
+    .hero h1 em {
+      color: var(--primary);
+      font-style: italic
+    }
+
+    .hero p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, .6);
+      margin-bottom: 28px;
+      font-weight: 400
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: .2s;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 107, 0, .35)
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      border: 1.5px solid rgba(255, 255, 255, .2)
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, .15);
+      border-color: rgba(255, 255, 255, .4)
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: #fff
+    }
+
+    .btn-purple:hover {
+      opacity: .9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .4)
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 12px
+    }
+
+    /* Floating particles */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float linear infinite
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0
+      }
+
+      10% {
+        opacity: .6
+      }
+
+      90% {
+        opacity: .3
+      }
+
+      100% {
+        transform: translateY(-100px) rotate(720deg);
+        opacity: 0
+      }
+    }
+
+    /* ── PROMO BAND ── */
+    .promo-band {
+      background: linear-gradient(135deg, #1e0a3c, #0a1a3c, #1e0a3c);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #fff;
+      flex-wrap: wrap;
+      margin: 16px auto 0;
+      max-width: 1440px;
+      padding: 0 20px;
+      border: 1px solid rgba(124, 58, 237, .2)
+    }
+
+    .promo-band-inner {
+      background: linear-gradient(135deg, rgba(124, 58, 237, .12), rgba(59, 130, 246, .12));
+      border: 1px solid rgba(124, 58, 237, .2);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap
+    }
+
+    .promo-glow {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(124, 58, 237, .4)
+    }
+
+    /* ── CATEGORIES ── */
+    .categories-section {
+      max-width: 1440px;
+      margin: 20px auto;
+      padding: 0 20px
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--navy)
+    }
+
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px
+    }
+
+    .cat-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 10px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: .25s;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden
+    }
+
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), #ff9900);
+      opacity: 0;
+      transition: .25s
+    }
+
+    .cat-card:hover,
+    .cat-card.active {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md)
+    }
+
+    .cat-card:hover .cat-icon,
+    .cat-card.active .cat-icon {
+      transform: scale(1.15)
+    }
+
+    .cat-icon {
+      font-size: 28px;
+      margin-bottom: 7px;
+      transition: .25s;
+      display: block
+    }
+
+    .cat-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      position: relative
+    }
+
+    /* ── DEALS BANNER ── */
+    .deals-banner {
+      background: linear-gradient(90deg, #8b0000, var(--red), #c0392b);
+      color: #fff;
+      padding: 13px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 1440px;
+      margin: 16px auto 0;
+      padding: 0 20px
+    }
+
+    .deals-inner {
+      background: linear-gradient(90deg, rgba(0, 0, 0, .3), rgba(0, 0, 0, .1));
+      border-radius: var(--radius);
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%
+    }
+
+    .deal-badge {
+      background: rgba(255, 255, 255, .25);
+      border-radius: var(--radius-sm);
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .5px
+    }
+
+    .deal-timer {
+      margin-left: auto;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .timer-unit {
+      background: rgba(0, 0, 0, .4);
+      border-radius: var(--radius-sm);
+      padding: 4px 9px;
+      font-weight: 800;
+      font-size: 17px;
+      min-width: 34px;
+      text-align: center;
+      font-family: 'Space Mono', monospace
+    }
+
+    /* ── PRODUCT GRID ── */
+    .products-section {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .filters-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap
+    }
+
+    .filter-select {
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      background: var(--white);
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 500
+    }
+
+    .results-count {
+      font-size: 13px;
+      color: var(--text2);
+      margin-left: auto;
+      font-weight: 500
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px
+    }
+
+    /* Product Card */
+    .product-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: .25s;
+      cursor: pointer;
+      position: relative;
+      border: 2px solid transparent
+    }
+
+    .product-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+      border-color: rgba(124, 58, 237, .1)
+    }
+
+    .product-img-wrap {
+      position: relative;
+      overflow: hidden;
+      background: #fafbfc;
+      aspect-ratio: 1
+    }
+
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 12px;
+      transition: .4s;
+      display: block
+    }
+
+    .product-card:hover .product-img-wrap img {
+      transform: scale(1.07)
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 800;
+      z-index: 2;
+      letter-spacing: .3px
+    }
+
+    .badge-sale {
+      background: var(--red);
+      color: #fff
+    }
+
+    .badge-new {
+      background: var(--green);
+      color: #fff
+    }
+
+    .badge-prime {
+      background: #00a8e1;
+      color: #fff
+    }
+
+    .badge-engrave {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 800;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, .4)
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, .92);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: .2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+      z-index: 2
+    }
+
+    .wishlist-btn:hover {
+      transform: scale(1.12)
+    }
+
+    .product-info {
+      padding: 12px
+    }
+
+    .product-brand {
+      font-size: 10px;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 2px;
+      font-weight: 600
+    }
+
+    .product-name {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden
+    }
+
+    .stars {
+      color: #e6a817;
+      font-size: 12px
+    }
+
+    .reviews-count {
+      font-size: 10px;
+      color: var(--blue);
+      margin-bottom: 4px
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin: 4px 0
+    }
+
+    .price {
+      font-size: 17px;
+      font-weight: 800
+    }
+
+    .price-original {
+      font-size: 11px;
+      color: var(--text3);
+      text-decoration: line-through
+    }
+
+    .discount {
+      font-size: 11px;
+      color: var(--red);
+      font-weight: 700
+    }
+
+    .engrave-tag {
+      font-size: 10px;
+      color: var(--purple);
+      background: var(--purple-light);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 800;
+      display: inline-block;
+      margin-bottom: 5px;
+      border: 1px solid var(--purple-border)
+    }
+
+    .card-btns {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px
+    }
+
+    .atc-btn {
+      flex: 1;
+      padding: 8px;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .atc-btn:hover {
+      background: var(--primary-dark)
+    }
+
+    .engrave-btn {
+      padding: 8px 10px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .2s;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, .3)
+    }
+
+    .engrave-btn:hover {
+      opacity: .88;
+      transform: translateY(-1px)
+    }
+
+    /* ── AI SECTION ── */
+    .ai-section {
+      max-width: 1440px;
+      margin: 16px auto 0;
+      padding: 0 20px 16px
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--navy), var(--navy2));
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    .ai-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #ff6b00, #ff9900);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0
+    }
+
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 12px
+    }
+
+    .ai-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: .2s;
+      border: 2px solid var(--border2)
+    }
+
+    .ai-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md)
+    }
+
+    .ai-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      background: #f9f9f9;
+      padding: 4px
+    }
+
+    .ai-reason {
+      font-size: 10px;
+      color: var(--blue);
+      background: rgba(9, 105, 218, .07);
+      padding: 3px 7px;
+      border-radius: var(--radius-sm);
+      font-weight: 600
+    }
+
+    .ai-loading {
+      text-align: center;
+      padding: 36px;
+      color: var(--text2);
+      grid-column: 1/-1
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 10px
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ── DETAIL PAGE ── */
+    #product-detail-page {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px 20px
+    }
+
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--blue);
+      margin-bottom: 16px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-weight: 500
+    }
+
+    .breadcrumb span {
+      cursor: pointer
+    }
+
+    .breadcrumb span:hover {
+      text-decoration: underline
+    }
+
+    .breadcrumb .sep {
+      color: var(--text3)
+    }
+
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px 280px;
+      gap: 24px;
+      align-items: start
+    }
+
+    @media(max-width:960px) {
+      .detail-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .detail-images {
+      position: sticky;
+      top: 72px
+    }
+
+    .main-img-box {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 10px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--border2)
+    }
+
+    .main-img-box img {
+      max-width: 100%;
+      max-height: 280px;
+      object-fit: contain
+    }
+
+    .thumb-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px
+    }
+
+    .thumb {
+      width: 60px;
+      height: 60px;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: .15s;
+      flex-shrink: 0;
+      box-shadow: var(--shadow)
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 3px
+    }
+
+    .thumb.active,
+    .thumb:hover {
+      border-color: var(--primary)
+    }
+
+    .detail-brand {
+      font-size: 11px;
+      color: var(--blue);
+      margin-bottom: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px
+    }
+
+    .detail-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px
+    }
+
+    .detail-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    .detail-price .current {
+      font-size: 32px;
+      font-weight: 900
+    }
+
+    .detail-price .was {
+      font-size: 13px;
+      color: var(--text2)
+    }
+
+    .engrave-promo {
+      background: linear-gradient(135deg, #1a0533, #001433);
+      border: 1.5px solid rgba(124, 58, 237, .3);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin: 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff
+    }
+
+    .engrave-promo h4 {
+      font-size: 13px;
+      font-weight: 800;
+      color: #e2d9f3;
+      margin-bottom: 2px
+    }
+
+    .engrave-promo p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .engrave-promo .ep-btn {
+      margin-left: auto;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .2s;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, .4)
+    }
+
+    .ep-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .5)
+    }
+
+    .detail-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin: 14px 0;
+      border-top: 1px solid var(--border2);
+      padding-top: 14px
+    }
+
+    .detail-features {
+      list-style: none;
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .detail-features li {
+      display: flex;
+      gap: 8px;
+      font-size: 13px;
+      align-items: flex-start
+    }
+
+    .detail-features li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 800;
+      margin-top: 1px;
+      flex-shrink: 0
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 14px;
+      margin: 12px 0;
+      font-size: 12px
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column
+    }
+
+    .spec-label {
+      color: var(--text3);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-weight: 600
+    }
+
+    .spec-value {
+      font-weight: 700
+    }
+
+    .buy-box {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      border: 1.5px solid var(--border2);
+      position: sticky;
+      top: 72px
+    }
+
+    .buy-box .price {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 4px
+    }
+
+    .delivery-info {
+      font-size: 12px;
+      margin: 10px 0;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-radius: var(--radius-sm)
+    }
+
+    .delivery-info .fast {
+      color: var(--green);
+      font-weight: 700
+    }
+
+    .stock-status {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 7px 0
+    }
+
+    .stock-status.in {
+      color: var(--green)
+    }
+
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0
+    }
+
+    .qty-select {
+      padding: 6px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      background: var(--white);
+      cursor: pointer;
+      font-weight: 600
+    }
+
+    .buy-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      letter-spacing: .2px
+    }
+
+    .buy-btn.cart {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .buy-btn.cart:hover {
+      background: var(--primary-dark)
+    }
+
+    .buy-btn.now {
+      background: #e65100;
+      color: #fff
+    }
+
+    .buy-btn.now:hover {
+      background: #bf360c
+    }
+
+    .buy-btn.custom {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, .3)
+    }
+
+    .buy-btn.custom:hover {
+      opacity: .9;
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .4)
+    }
+
+    .buy-btn.wish {
+      background: var(--surface);
+      color: var(--text);
+      border: 1.5px solid var(--border)
+    }
+
+    .custom-pricing-box {
+      background: linear-gradient(135deg, rgba(124, 58, 237, .06), rgba(59, 130, 246, .06));
+      border: 1.5px solid rgba(124, 58, 237, .2);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 12px
+    }
+
+    .secure-badge {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 10px
+    }
+
+    /* ── CART ── */
+    #cart-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 18px;
+      align-items: start
+    }
+
+    @media(max-width:700px) {
+      .cart-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .cart-main {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .cart-main h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border2)
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border2)
+    }
+
+    .cart-item-img {
+      width: 82px;
+      height: 82px;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .cart-item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px
+    }
+
+    .cart-item-info {
+      flex: 1
+    }
+
+    .cart-item-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      cursor: pointer;
+      color: var(--navy)
+    }
+
+    .cart-item-name:hover {
+      color: var(--blue);
+      text-decoration: underline
+    }
+
+    .cart-item-brand {
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500
+    }
+
+    .cart-item-engrave {
+      font-size: 11px;
+      color: var(--purple);
+      background: var(--purple-light);
+      padding: 3px 9px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 5px;
+      font-weight: 700;
+      border: 1px solid var(--purple-border)
+    }
+
+    .cart-engrave-preview {
+      width: 58px;
+      height: 58px;
+      flex-shrink: 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1.5px solid var(--purple-border)
+    }
+
+    .cart-engrave-preview canvas {
+      width: 58px;
+      height: 58px;
+      display: block
+    }
+
+    .cart-item-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden
+    }
+
+    .qty-btn {
+      background: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: .15s
+    }
+
+    .qty-btn:hover {
+      background: var(--surface)
+    }
+
+    .qty-display {
+      width: 32px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--red);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600
+    }
+
+    .remove-btn:hover {
+      text-decoration: underline
+    }
+
+    .cart-item-price {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .cart-item-price .amount {
+      font-size: 17px;
+      font-weight: 800
+    }
+
+    .cart-summary {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 72px
+    }
+
+    .cart-summary h3 {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 14px
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 9px;
+      color: var(--text2)
+    }
+
+    .summary-row.total {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text);
+      border-top: 1px solid var(--border2);
+      padding-top: 10px;
+      margin-top: 4px
+    }
+
+    .summary-row.savings {
+      color: var(--green);
+      font-weight: 700
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--primary);
+      border: none;
+      border-radius: 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: .2s
+    }
+
+    .checkout-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 107, 0, .35)
+    }
+
+    /* AUTH MODAL */
+    .auth-modal-inner {
+      padding: 28px
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border2);
+      margin-bottom: 18px
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text2);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: .15s
+    }
+
+    .auth-tab.active {
+      color: var(--navy);
+      border-bottom-color: var(--primary)
+    }
+
+    .form-group {
+      margin-bottom: 12px
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text2)
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      transition: .15s;
+      font-weight: 500
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, .1)
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 11px;
+      background: var(--primary);
+      border: none;
+      border-radius: 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .form-submit:hover {
+      background: var(--primary-dark)
+    }
+
+    /* PROFILE */
+    #profile-page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 20px
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, var(--navy), var(--navy2));
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 20px
+    }
+
+    .profile-avatar {
+      width: 66px;
+      height: 66px;
+      background: linear-gradient(135deg, var(--primary), #ff9900);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .profile-email {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .profile-member {
+      font-size: 11px;
+      color: #3fb950;
+      font-weight: 700;
+      margin-top: 3px
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    @media(max-width:600px) {
+      .profile-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .profile-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow)
+    }
+
+    .profile-card h3 {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .order-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border2);
+      font-size: 12px
+    }
+
+    .order-row:last-child {
+      border-bottom: none
+    }
+
+    .order-emoji {
+      font-size: 22px
+    }
+
+    .order-details {
+      flex: 1
+    }
+
+    .order-name {
+      font-weight: 700;
+      margin-bottom: 1px
+    }
+
+    .order-meta {
+      color: var(--text2)
+    }
+
+    .order-status {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 700
+    }
+
+    .order-status.delivered {
+      background: #e6ffed;
+      color: var(--green)
+    }
+
+    .order-status.transit {
+      background: #ddf4ff;
+      color: #0969da
+    }
+
+    /* CHECKOUT */
+    #checkout-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 20px
+    }
+
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 18px
+    }
+
+    @media(max-width:680px) {
+      .checkout-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .checkout-step {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px
+    }
+
+    .checkout-step h3 {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .payment-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: .15s;
+      margin-bottom: 8px
+    }
+
+    .payment-opt.active {
+      border-color: var(--primary);
+      background: var(--primary-light)
+    }
+
+    .payment-opt input[type=radio] {
+      accent-color: var(--primary)
+    }
+
+    .payment-opt-label {
+      font-weight: 700;
+      font-size: 13px
+    }
+
+    .payment-opt-sub {
+      font-size: 11px;
+      color: var(--text2)
+    }
+
+    .payment-icons {
+      font-size: 18px;
+      margin-left: auto
+    }
+
+    .order-place-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      border: none;
+      border-radius: 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .order-place-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 107, 0, .35)
+    }
+
+    .order-summary-sidebar {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 72px
+    }
+
+    .os-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px
+    }
+
+    .os-item-img {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      background: #f8f8f8;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .os-item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain
+    }
+
+    .os-item-name {
+      font-weight: 700;
+      margin-bottom: 1px
+    }
+
+    .os-item-price {
+      font-weight: 800;
+      margin-left: auto;
+      flex-shrink: 0
+    }
+
+    .os-divider {
+      border: none;
+      border-top: 1px solid var(--border2);
+      margin: 10px 0
+    }
+
+    .os-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 7px;
+      color: var(--text2)
+    }
+
+    .os-row.total {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 15px
+    }
+
+    /* SUCCESS */
+    #success-page {
+      max-width: 580px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center
+    }
+
+    .success-icon {
+      font-size: 72px;
+      margin-bottom: 18px;
+      animation: bounce .6s ease
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.15)
+      }
+    }
+
+    .success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green);
+      margin-bottom: 6px
+    }
+
+    .order-id {
+      background: var(--surface);
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 20px;
+      border: 2px dashed var(--border)
+    }
+
+    /* SEARCH */
+    .search-results-header {
+      max-width: 1440px;
+      margin: 16px auto 0;
+      padding: 0 20px;
+      font-size: 15px;
+      color: var(--text2)
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--navy);
+      color: #ccc;
+      margin-top: 50px
+    }
+
+    .footer-top {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px
+    }
+
+    .footer-col h4 {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: .3px
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px
+    }
+
+    .footer-col ul li {
+      font-size: 12px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 500
+    }
+
+    .footer-col ul li:hover {
+      color: #fff
+    }
+
+    .footer-bottom {
+      background: var(--navy2);
+      text-align: center;
+      padding: 16px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .3);
+      border-top: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    /* Responsive */
+    @media(max-width:768px) {
+      .hero h1 {
+        font-size: 34px
+      }
+
+      .header-top {
+        gap: 8px;
+        padding: 8px 12px
+      }
+
+      .hbtn .small {
+        display: none
+      }
+
+      #search-category {
+        display: none
+      }
+
+      .deals-inner{
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .deal-timer{
+        margin-left: 0;
+      }
+
+      .ai-header{
+        flex-wrap:wrap;
+        justify-content: center;
+      }
+
+      .btn-ghost{
+        margin-left: 0 !important;
+      }
+
+      .product-grid{
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card-btns {
+        flex-wrap: wrap;
+      }
+
+      .engrave-btn {
+        width: 150px;
+      }
+
+      .filter-select {
+        width: 155px;
+      }
+
+      .engrave-tag {
+        font-size: 9px;
+        width: 125px;
+      }
+
+      .footer-top {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+
+
+      /* Mobile Header */
+@media (max-width: 768px) {
+
+  .header-top {
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+
+  .search-bar {
+    width: 100%;
+    order: 3;
+    height: 40px;
+  }
+
+  #search-category {
+    width: 80px;
+    font-size: 11px;
+  }
+
+  #search-input {
+    font-size: 13px;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    gap: 4px;
+  }
+
+  .hbtn .small {
+    display: none;
+  }
+
+  .hbtn .big {
+    font-size: 12px;
+  }
+
+  .header-bottom {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0 10px;
+    scrollbar-width: none;
+    flex-wrap: wrap;
+  }
+
+  .header-bottom::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    flex-shrink: 0;
+    padding: 10px 12px;
+  }
+}
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast"></div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
+      <div class="auth-modal-inner">
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px">Welcome to
+          ShopWave</h2>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Sign in or create your account</p>
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchTab('login',event)">Sign In</button>
+          <button class="auth-tab" onclick="switchTab('register',event)">Create Account</button>
+        </div>
+        <div id="login-form">
+          <div class="form-group"><label>Email</label><input class="form-input" type="email" id="login-email"
+              placeholder="Enter your email"></div>
+          <div class="form-group"><label>Password</label><input class="form-input" type="password" id="login-password"
+              placeholder="Enter your password"></div>
+          <button class="form-submit" onclick="doLogin()">Sign In</button>
+        </div>
+        <div id="register-form" style="display:none">
+          <div class="form-group"><label>Full Name</label><input class="form-input" type="text" id="reg-name"
+              placeholder="Your full name"></div>
+          <div class="form-group"><label>Email</label><input class="form-input" type="email" id="reg-email"
+              placeholder="Your email address"></div>
+          <div class="form-group"><label>Password</label><input class="form-input" type="password" id="reg-password"
+              placeholder="Create a password (min 6 chars)"></div>
+          <button class="form-submit" onclick="doRegister()">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     ENGRAVING STUDIO MODAL
+═══════════════════════════════════════ -->
+  <div class="eng-overlay" id="eng-overlay">
+    <div class="eng-studio" id="eng-studio">
+      <div class="eng-studio-header">
+        <div class="studio-icon">✍️</div>
+        <div>
+          <h2>Engraving Studio</h2>
+          <p id="eng-product-subtitle">Personalise your product with laser precision</p>
+        </div>
+        <button class="close-studio" onclick="closeEngravingStudio()">✕ Close</button>
+      </div>
+      <div class="eng-studio-body">
+        <!-- LEFT: Controls -->
+        <div class="eng-panel-left">
+          <!-- Text -->
+          <div>
+            <div class="eng-section-label">Your Text</div>
+            <input class="eng-text-input" type="text" id="eng-text" placeholder="Type name, message…" maxlength="20"
+              oninput="onEngTextInput()">
+            <div class="char-tracker">
+              <div class="char-bar">
+                <div class="char-bar-fill" id="eng-char-fill" style="width:0%"></div>
+              </div>
+              <span class="char-count"><span id="eng-char-left">20</span>/20</span>
+            </div>
+          </div>
+
+          <!-- Font Style -->
+          <div>
+            <div class="eng-section-label">Font Style</div>
+            <div class="font-grid">
+              <div class="font-opt sel" data-s="0" onclick="pickFont(0,this)">
+                <div class="fn">Classic Serif</div>
+                <div class="fs" style="font-family:'Playfair Display',serif">Arjun</div>
+              </div>
+              <div class="font-opt" data-s="1" onclick="pickFont(1,this)">
+                <div class="fn">Bold Sans</div>
+                <div class="fs" style="font-family:'Outfit',sans-serif;font-weight:900;letter-spacing:2px">ARJUN</div>
+              </div>
+              <div class="font-opt" data-s="2" onclick="pickFont(2,this)">
+                <div class="fn">Script</div>
+                <div class="fs" style="font-family:'Dancing Script',cursive;font-size:14px">Arjun</div>
+              </div>
+              <div class="font-opt" data-s="3" onclick="pickFont(3,this)">
+                <div class="fn">Monospace</div>
+                <div class="fs" style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px">ARJUN</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Font Size -->
+          <div>
+            <div class="size-row">
+              <div class="eng-section-label" style="margin-bottom:0">Font Size</div>
+              <span class="size-val" id="size-val">22px</span>
+            </div>
+            <input type="range" class="eng-slider" id="size-slider" min="12" max="42" value="22"
+              oninput="onSizeChange()">
+          </div>
+
+          <!-- Color -->
+          <div>
+            <div class="eng-section-label">Engraving Color</div>
+            <div class="color-palette">
+              <div class="clr sel" data-c="#FFD700" style="background:#FFD700" onclick="pickColor('#FFD700',this)"
+                title="Gold"></div>
+              <div class="clr" data-c="#C0C0C0" style="background:#C0C0C0" onclick="pickColor('#C0C0C0',this)"
+                title="Silver"></div>
+              <div class="clr" data-c="#ffffff" style="background:#fff;border:2px solid rgba(255,255,255,.3)"
+                onclick="pickColor('#ffffff',this)" title="White"></div>
+              <div class="clr" data-c="#1a1a1a" style="background:#1a1a1a;border:2px solid rgba(255,255,255,.15)"
+                onclick="pickColor('#1a1a1a',this)" title="Black"></div>
+              <div class="clr" data-c="#7c3aed" style="background:#7c3aed" onclick="pickColor('#7c3aed',this)"
+                title="Purple"></div>
+              <div class="clr" data-c="#0ea5e9" style="background:#0ea5e9" onclick="pickColor('#0ea5e9',this)"
+                title="Blue"></div>
+              <div class="clr" data-c="#ef4444" style="background:#ef4444" onclick="pickColor('#ef4444',this)"
+                title="Red"></div>
+              <div class="clr" data-c="#10b981" style="background:#10b981" onclick="pickColor('#10b981',this)"
+                title="Teal"></div>
+            </div>
+          </div>
+
+          <!-- Opacity -->
+          <div>
+            <div class="size-row">
+              <div class="eng-section-label" style="margin-bottom:0">Opacity</div>
+              <span class="opacity-val" id="opacity-val">90%</span>
+            </div>
+            <input type="range" class="eng-slider" id="opacity-slider" min="20" max="100" value="90"
+              oninput="onOpacityChange()">
+          </div>
+
+          <!-- Effects -->
+          <div>
+            <div class="eng-section-label">Engraving Effect</div>
+            <div class="effect-grid">
+              <div class="effect-opt sel" data-e="laser" onclick="pickEffect('laser',this)"><span
+                  class="ei">⚡</span>Laser Cut</div>
+              <div class="effect-opt" data-e="emboss" onclick="pickEffect('emboss',this)"><span
+                  class="ei">🔷</span>Embossed</div>
+              <div class="effect-opt" data-e="neon" onclick="pickEffect('neon',this)"><span class="ei">💡</span>Neon
+                Glow</div>
+              <div class="effect-opt" data-e="deboss" onclick="pickEffect('deboss',this)"><span
+                  class="ei">🔲</span>Debossed</div>
+            </div>
+          </div>
+
+          <!-- Realistic badge -->
+          <div class="realistic-badge">
+            <strong>🔬 Photo-Realistic Engraving</strong>
+            Canvas engine simulates actual laser engraving with reflection & depth
+          </div>
+        </div>
+
+        <!-- CENTER: Canvas -->
+        <div class="eng-panel-center">
+          <div class="view-toggle">
+            <button class="view-btn sel" id="vb-back" onclick="setView('back',this)">📱 Back (Engravable)</button>
+            <button class="view-btn" id="vb-front" onclick="setView('front',this)">🖥 Front View</button>
+          </div>
+          <div class="eng-canvas-wrap" id="canvas-wrap">
+            <canvas id="eng-canvas" width="380" height="380"></canvas>
+            <!-- Drag handle -->
+            <div class="drag-handle" id="drag-handle" style="left:50%;top:80%">
+              <div class="drag-handle-dot" id="drag-dot"></div>
+            </div>
+          </div>
+          <div class="eng-canvas-hint">Drag the <span>purple dot ●</span> to reposition engraving</div>
+        </div>
+
+        <!-- RIGHT: Preview & Price -->
+        <div class="eng-panel-right">
+          <div>
+            <div class="eng-section-label">Before vs After</div>
+            <div class="compare-row">
+              <div class="cmp-card before">
+                <div class="cmp-canvas-wrap"><canvas id="cmp-before" width="110" height="110"></canvas></div>
+                <div class="cmp-label">Original</div>
+              </div>
+              <div class="cmp-card after">
+                <div class="cmp-canvas-wrap"><canvas id="cmp-after" width="110" height="110"></canvas></div>
+                <div class="cmp-label">✨ Engraved</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product name -->
+          <div style="text-align:center">
+            <div
+              style="font-size:11px;color:rgba(255,255,255,.3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">
+              Selected Product</div>
+            <div id="eng-prod-name" style="font-size:13px;font-weight:800;color:#fff;line-height:1.3"></div>
+            <div id="eng-prod-brand"
+              style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;text-transform:uppercase;letter-spacing:.6px">
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="price-breakdown">
+            <div
+              style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">
+              Price Breakdown</div>
+            <div class="pb-row"><span>Base Price</span><span id="pb-base">₹0</span></div>
+            <div class="pb-row eng"><span>✨ Laser Engraving</span><span>+ ₹499</span></div>
+            <div class="pb-row tot"><span>Your Total</span><span id="pb-total">₹499</span></div>
+          </div>
+
+          <!-- CTA -->
+          <button class="eng-add-btn" onclick="confirmEngraving()">✨ Add Engraved to Cart</button>
+          <button class="eng-cancel-btn" onclick="closeEngravingStudio()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <a class="logo" onclick="showPage('home')">Shop<span>Wave</span></a>
+      <div class="search-bar">
+        <select id="search-category">
+          <option>All</option>
+          <option>Electronics</option>
+          <option>Clothing</option>
+          <option>Home</option>
+          <option>Books</option>
+          <option>Sports</option>
+          <option>Beauty</option>
+          <option>Toys</option>
+          <option>Garden</option>
+        </select>
+        <input type="text" id="search-input" placeholder="Search products, brands and more…"
+          onkeypress="if(event.key==='Enter')doSearch()">
+        <button class="search-btn" onclick="doSearch()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="#fff" stroke-width="2.5"
+              stroke-linecap="round" />
+          </svg></button>
+      </div>
+      <div class="header-actions">
+        <button class="hbtn" id="auth-btn" onclick="handleAuthClick()"><span class="small">Hello, Sign in</span><span
+            class="big">Account & Orders</span></button>
+        <button class="hbtn cart-btn" onclick="showPage('cart')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="white"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="cart-count" id="cart-count">0</span>Cart
+        </button>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <button class="nav-link active" onclick="showPage('home');setActiveNav(this)">🏠 Home</button>
+      <button class="nav-link" onclick="filterCat('Electronics');setActiveNav(this)">📱 Electronics</button>
+      <button class="nav-link" onclick="filterCat('Clothing');setActiveNav(this)">👗 Fashion</button>
+      <button class="nav-link" onclick="filterCat('Home');setActiveNav(this)">🏡 Home</button>
+      <button class="nav-link" onclick="filterCat('Books');setActiveNav(this)">📚 Books</button>
+      <button class="nav-link" onclick="filterCat('Sports');setActiveNav(this)">⚽ Sports</button>
+      <button class="nav-link" onclick="filterCat('Beauty');setActiveNav(this)">💄 Beauty</button>
+      <button class="nav-link" onclick="filterCat('Toys');setActiveNav(this)">🧸 Toys</button>
+      <button class="nav-link" onclick="filterCat('Garden');setActiveNav(this)">🌱 Garden</button>
+      <button class="nav-link" onclick="showPage('profile');setActiveNav(this)">👤 Account</button>
+    </div>
+  </header>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="home-page">
+    <div class="hero">
+      <!-- Floating particles -->
+      <div class="particle"
+        style="left:10%;width:4px;height:4px;background:#7c3aed;animation-duration:8s;animation-delay:0s"></div>
+      <div class="particle"
+        style="left:25%;width:3px;height:3px;background:#ff6b00;animation-duration:11s;animation-delay:2s"></div>
+      <div class="particle"
+        style="left:60%;width:5px;height:5px;background:#3b82f6;animation-duration:9s;animation-delay:4s"></div>
+      <div class="particle"
+        style="left:80%;width:3px;height:3px;background:#10b981;animation-duration:12s;animation-delay:1s"></div>
+      <div class="hero-inner">
+        <div class="hero-eyebrow">✨ Now with Laser Engraving Studio</div>
+        <h1>Everything You Need,<br><em>Delivered Fast.</em></h1>
+        <p>Shop millions of products. Personalise electronics with our photorealistic laser engraving.</p>
+        <div class="hero-btns">
+          <button class="btn btn-primary"
+            onclick="document.getElementById('shop-now').scrollIntoView({behavior:'smooth'})">🛍️ Shop Now</button>
+          <button class="btn btn-purple" onclick="filterCat('Electronics')">✍️ Try Engraving Studio</button>
+          <button class="btn btn-ghost" onclick="filterCat('Clothing')">👗 Fashion</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 20px;max-width:1440px;margin:0 auto">
+      <div class="promo-band" style="padding:0;margin:16px 0 0">
+        <div class="promo-band-inner">
+          <div class="promo-glow">✍️</div>
+          <div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:3px;color:#fff">🔥 Realistic Laser Engraving — Drag
+              &amp; Drop Positioning!</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.55)">See your name engraved on iPhone, MacBook, AirPods
+              &amp; more with 4 effects. Perfect gift idea.</div>
+          </div>
+          <button class="btn btn-purple" style="margin-left:auto" onclick="filterCat('Electronics')">Engrave Now
+            →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="categories-section">
+      <h2 class="section-title">Shop by Category</h2>
+      <div class="cat-grid" id="cat-grid">
+        <div class="cat-card" onclick="filterCat('Electronics')"><span class="cat-icon">📱</span>
+          <div class="cat-name">Electronics</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Clothing')"><span class="cat-icon">👗</span>
+          <div class="cat-name">Fashion</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Home')"><span class="cat-icon">🏡</span>
+          <div class="cat-name">Home</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Books')"><span class="cat-icon">📚</span>
+          <div class="cat-name">Books</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Sports')"><span class="cat-icon">⚽</span>
+          <div class="cat-name">Sports</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Beauty')"><span class="cat-icon">💄</span>
+          <div class="cat-name">Beauty</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Toys')"><span class="cat-icon">🧸</span>
+          <div class="cat-name">Toys</div>
+        </div>
+        <div class="cat-card" onclick="filterCat('Garden')"><span class="cat-icon">🌱</span>
+          <div class="cat-name">Garden</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 20px;max-width:1440px;margin:0 auto">
+      <div class="deals-banner" style="padding:0">
+        <div class="deals-inner">
+          <span class="deal-badge">⚡ LIVE</span>
+          <span style="font-weight:700;font-size:14px">Deal of the Day — Up to 70% Off!</span>
+          <div class="deal-timer">Ends in:<span class="timer-unit" id="t-h">04</span>:<span class="timer-unit"
+              id="t-m">32</span>:<span class="timer-unit" id="t-s">10</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-section">
+      <div class="ai-header">
+        <div class="ai-icon">🤖</div>
+        <div>
+          <h2 style="font-size:16px;font-weight:800;color:#fff">AI Picks Just For You</h2>
+          <p style="font-size:11px;color:rgba(255,255,255,.4)">Personalised by Claude AI</p>
+        </div>
+        <button class="btn btn-sm btn-ghost" style="margin-left:auto" onclick="loadAI()">↻ Refresh</button>
+      </div>
+      <div class="ai-grid" id="ai-products">
+        <div class="ai-loading">
+          <div class="spinner"></div>
+          <p>Getting your picks…</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="products-section" id="shop-now">
+      <h2 class="section-title" id="products-heading">Featured Products</h2>
+      <div class="filters-row">
+        <select class="filter-select" id="sort-select" onchange="renderProducts()">
+          <option value="">Sort: Featured</option>
+          <option value="price-asc">Price: Low→High</option>
+          <option value="price-desc">Price: High→Low</option>
+          <option value="rating">Top Rated</option>
+          <option value="name">Name A–Z</option>
+        </select>
+        <select class="filter-select" id="cat-select" onchange="filterFromSelect()">
+          <option value="">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Home">Home</option>
+          <option value="Books">Books</option>
+          <option value="Sports">Sports</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Toys">Toys</option>
+          <option value="Garden">Garden</option>
+        </select>
+        <select class="filter-select" id="price-filter" onchange="renderProducts()">
+          <option value="">Any Price</option>
+          <option value="0-500">Under ₹500</option>
+          <option value="500-2000">₹500–₹2,000</option>
+          <option value="2000-10000">₹2,000–₹10,000</option>
+          <option value="10000-999999">Over ₹10,000</option>
+        </select>
+        <select class="filter-select" id="rating-filter" onchange="renderProducts()">
+          <option value="">Any Rating</option>
+          <option value="4">4★ &amp; Up</option>
+          <option value="3">3★ &amp; Up</option>
+        </select>
+        <span class="results-count" id="results-count"></span>
+      </div>
+      <div class="product-grid" id="product-grid"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH PAGE -->
+  <div class="page" id="search-page">
+    <div class="search-results-header" id="search-header"></div>
+    <div class="products-section">
+      <div class="product-grid" id="search-grid"></div>
+    </div>
+  </div>
+
+  <!-- DETAIL PAGE -->
+  <div class="page" id="product-detail-page">
+    <div style="max-width:1240px;margin:0 auto;padding:16px 20px 0">
+      <div class="breadcrumb" id="breadcrumb"></div>
+    </div>
+    <div id="detail-content" style="max-width:1240px;margin:0 auto;padding:0 20px 24px"></div>
+  </div>
+
+  <!-- CART PAGE -->
+  <div class="page" id="cart-page">
+    <div class="cart-layout">
+      <div class="cart-main">
+        <h2>🛒 Shopping Cart</h2>
+        <div id="cart-items"></div>
+      </div>
+      <div class="cart-summary">
+        <h3>Order Summary</h3>
+        <div id="cart-summary-content"></div>
+        <button class="checkout-btn" onclick="showPage('checkout')">Proceed to Checkout →</button>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">🔒 Secure SSL checkout</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT PAGE -->
+  <div class="page" id="checkout-page">
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:18px">Checkout</h2>
+    <div class="checkout-layout">
+      <div>
+        <div class="checkout-step">
+          <h3><span class="step-num">1</span> Delivery Address</h3>
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input class="form-input" id="ch-fname" type="text"
+                placeholder="First name"></div>
+            <div class="form-group"><label>Last Name</label><input class="form-input" id="ch-lname" type="text"
+                placeholder="Last name"></div>
+          </div>
+          <div class="form-group"><label>Address</label><input class="form-input" id="ch-addr1" type="text"
+              placeholder="House/Flat No., Street"></div>
+          <div class="form-row">
+            <div class="form-group"><label>City</label><input class="form-input" id="ch-city" type="text"
+                placeholder="City"></div>
+            <div class="form-group"><label>PIN Code</label><input class="form-input" id="ch-pin" type="text"
+                placeholder="6-digit PIN"></div>
+          </div>
+          <div class="form-group"><label>Phone</label><input class="form-input" id="ch-phone" type="tel"
+              placeholder="+91 XXXXXXXXXX"></div>
+        </div>
+        <div class="checkout-step">
+          <h3><span class="step-num">2</span> Payment Method</h3>
+          <label class="payment-opt active" onclick="selectPayment(this)"><input type="radio" name="payment" checked>
+            <div>
+              <div class="payment-opt-label">UPI Payment</div>
+              <div class="payment-opt-sub">GPay, PhonePe, Paytm</div>
+            </div><span class="payment-icons">📱</span>
+          </label>
+          <label class="payment-opt" onclick="selectPayment(this)"><input type="radio" name="payment">
+            <div>
+              <div class="payment-opt-label">Credit / Debit Card</div>
+              <div class="payment-opt-sub">Visa, Mastercard, RuPay</div>
+            </div><span class="payment-icons">💳</span>
+          </label>
+          <label class="payment-opt" onclick="selectPayment(this)"><input type="radio" name="payment">
+            <div>
+              <div class="payment-opt-label">Cash on Delivery</div>
+              <div class="payment-opt-sub">Pay when delivered</div>
+            </div><span class="payment-icons">💵</span>
+          </label>
+        </div>
+        <div id="checkout-engrave-items"></div>
+        <button class="order-place-btn" onclick="placeOrder()">🔒 Place Order Securely</button>
+      </div>
+      <div class="order-summary-sidebar">
+        <h3 style="font-size:15px;font-weight:800;margin-bottom:14px">Your Order</h3>
+        <div id="checkout-order-items"></div>
+        <hr class="os-divider">
+        <div id="checkout-order-totals"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS PAGE -->
+  <div class="page" id="success-page">
+    <div class="success-icon">🎉</div>
+    <h2 class="success-title">Order Placed Successfully!</h2>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px">Thank you for shopping with ShopWave!</p>
+    <div class="order-id" id="order-id-display"></div>
+    <div id="success-engrave-note"></div>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:22px">Estimated delivery: <strong>2–4 business
+        days</strong></p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="showPage('profile')">📦 Track Order</button>
+      <button class="btn" style="background:var(--surface);color:var(--text);border:1.5px solid var(--border)"
+        onclick="showPage('home')">🛍️ Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="profile-page">
+    <div id="profile-content"></div>
+  </div>
+
+  <footer>
+    <div class="footer-top">
+      <div class="footer-col">
+        <h4>Get to Know Us</h4>
+        <ul>
+          <li>About ShopWave</li>
+          <li>Careers</li>
+          <li>Press Releases</li>
+          <li>Gift Cards</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect with Us</h4>
+        <ul>
+          <li>Facebook</li>
+          <li>Twitter</li>
+          <li>Instagram</li>
+          <li>Sell on ShopWave</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Make Money with Us</h4>
+        <ul>
+          <li>Sell products online</li>
+          <li>Become an Affiliate</li>
+          <li>Advertise Your Products</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Let Us Help You</h4>
+        <ul>
+          <li>Your Account</li>
+          <li>Returns Centre</li>
+          <li>100% Purchase Protection</li>
+          <li>Help</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 ShopWave — Made with ❤️ in India &nbsp;|&nbsp; Realistic Laser Engraving
+      Technology</div>
+  </footer>
+
+  <script>
+    // ══════════════════════════════════════════
+    // CONSTANTS
+    // ══════════════════════════════════════════
+    const ENGRAVE_CHARGE = 499;
+
+    const FONTS = [
+      { name: 'Classic Serif', fn: (s) => `bold ${s}px 'Playfair Display',Georgia,serif`, sp: 1.5 },
+      { name: 'Bold Sans', fn: (s) => `900 ${s}px 'Outfit','DM Sans',Arial,sans-serif`, sp: 3 },
+      { name: 'Script', fn: (s) => `bold ${s}px 'Dancing Script',cursive`, sp: 1 },
+      { name: 'Monospace', fn: (s) => `bold ${s}px 'Space Mono',monospace`, sp: 2 }
+    ];
+
+    // ══════════════════════════════════════════
+    // PRODUCT DATABASE — Real product images
+    // ══════════════════════════════════════════
+    const PRODUCTS = [
+      // ELECTRONICS
+      {
+        id: 1, name: "Apple iPhone 15 Pro Max", brand: "Apple", category: "Electronics", price: 134900, originalPrice: 149900, rating: 4.8, reviews: 18432, emoji: "📱", badge: "prime", engravable: true,
+        img: "https://m.media-amazon.com/images/I/81Os1SDWpcL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71bVnDeSBFL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/81Os1SDWpcL._AC_SX522_.jpg", "https://m.media-amazon.com/images/I/71bVnDeSBFL._AC_SX522_.jpg"],
+        desc: "Experience the pinnacle of smartphone tech with the A17 Pro chip, titanium design, and a 48MP camera.",
+        features: ["A17 Pro chip with Neural Engine", "48MP Main camera with 5x Optical Zoom", "Titanium frame", "All-day battery", "Dynamic Island"],
+        specs: { Display: '6.7" Super Retina XDR', Storage: "256GB", OS: "iOS 17", Color: "Natural Titanium" }
+      },
+
+      {
+        id: 2, name: "Apple MacBook Air M3", brand: "Apple", category: "Electronics", price: 114900, originalPrice: 129900, rating: 4.9, reviews: 6543, emoji: "💻", badge: "new", engravable: true,
+        img: "https://m.media-amazon.com/images/I/71TPda7cwUL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/61ZM0JFY7iL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71TPda7cwUL._AC_SX522_.jpg", "https://m.media-amazon.com/images/I/61ZM0JFY7iL._AC_SX522_.jpg"],
+        desc: "World's best consumer laptop. M3 chip with 18-hour battery. Aluminium unibody.",
+        features: ["Apple M3 chip", "18-hour battery", "15.3\" Liquid Retina display", "MagSafe charging", "Up to 24GB unified memory"],
+        specs: { Processor: "M3", RAM: "8GB", Storage: "256GB SSD", Display: '15.3"' }
+      },
+
+      {
+        id: 3, name: "Apple AirPods Pro 2nd Gen", brand: "Apple", category: "Electronics", price: 24900, originalPrice: 26900, rating: 4.8, reviews: 34521, emoji: "🎵", badge: "prime", engravable: true,
+        img: "https://m.media-amazon.com/images/I/71zny7BTRlL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71zny7BTRlL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71zny7BTRlL._AC_SX522_.jpg"],
+        desc: "Active Noise Cancellation, Adaptive Transparency, and Personalized Spatial Audio.",
+        features: ["Active Noise Cancellation", "Adaptive Transparency", "30-hr total battery", "H2 chip", "MagSafe charging case"],
+        specs: { Battery: "30 hrs total", Chip: "H2", "Water Resist": "IPX4", Case: "MagSafe" }
+      },
+
+      {
+        id: 4, name: "Sony WH-1000XM5 Headphones", brand: "Sony", category: "Electronics", price: 24990, originalPrice: 34990, rating: 4.7, reviews: 12087, emoji: "🎧", badge: "sale", engravable: true,
+        img: "https://m.media-amazon.com/images/I/61eGBRsCwDL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71BmW7Bz3KL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/61eGBRsCwDL._AC_SX522_.jpg", "https://m.media-amazon.com/images/I/71BmW7Bz3KL._AC_SX522_.jpg"],
+        desc: "Industry-leading noise cancelling headphones with 30-hour battery.",
+        features: ["Industry-leading ANC", "30-hour battery", "Multipoint connection", "Speak-to-chat", "Premium HD voice"],
+        specs: { Type: "Over-ear", Battery: "30 hrs", Connectivity: "BT 5.2", NFC: "Yes" }
+      },
+
+      {
+        id: 5, name: "Samsung Galaxy S24 Ultra", brand: "Samsung", category: "Electronics", price: 129999, originalPrice: 139999, rating: 4.7, reviews: 9654, emoji: "📱", badge: "new", engravable: true,
+        img: "https://m.media-amazon.com/images/I/71IeKNjlk0L._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71IeKNjlk0L._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71IeKNjlk0L._AC_SX522_.jpg"],
+        desc: "Galaxy AI is here. Ultimate experience with S Pen, 200MP camera, titanium frame.",
+        features: ["200MP main camera", "Built-in S Pen", "Galaxy AI", "Titanium frame", "5000mAh battery"],
+        specs: { Display: '6.8" QHD+ AMOLED', RAM: "12GB", Storage: "256GB", OS: "Android 14" }
+      },
+
+      {
+        id: 6, name: "Canon EOS R50 Mirrorless", brand: "Canon", category: "Electronics", price: 64990, originalPrice: 79990, rating: 4.6, reviews: 4532, emoji: "📷", badge: "new", engravable: true,
+        img: "https://m.media-amazon.com/images/I/71nT4e5OEZL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71nT4e5OEZL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71nT4e5OEZL._AC_SX522_.jpg"],
+        desc: "Perfect mirrorless for creators. 24.2MP APS-C sensor with AI subject tracking.",
+        features: ["24.2MP APS-C sensor", "AI subject detection", "4K 30fps", "Flip-out touchscreen", "Wi-Fi & Bluetooth"],
+        specs: { Sensor: "24.2MP", Video: "4K 30fps", Screen: '3" flip', Weight: "375g" }
+      },
+
+      {
+        id: 7, name: "Samsung 55\" 4K QLED TV", brand: "Samsung", category: "Electronics", price: 64999, originalPrice: 89999, rating: 4.6, reviews: 8754, emoji: "📺", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71pnHoSLXfL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/71pnHoSLXfL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71pnHoSLXfL._AC_SX522_.jpg"],
+        desc: "4K QLED with Quantum Dot tech delivering 100% Color Volume.",
+        features: ["Quantum Dot 4K", "120Hz refresh", "Dolby Atmos", "SmartThings Hub", "Alexa & Google"],
+        specs: { Resolution: "4K UHD", Panel: "QLED", Refresh: "120Hz", HDR: "HDR10+" }
+      },
+
+      {
+        id: 8, name: "boAt Airdopes 141 TWS", brand: "boAt", category: "Electronics", price: 999, originalPrice: 2990, rating: 4.2, reviews: 456789, emoji: "🎵", badge: "sale", engravable: true,
+        img: "https://m.media-amazon.com/images/I/51DUOt6RFQL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/51DUOt6RFQL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/51DUOt6RFQL._AC_SX522_.jpg"],
+        desc: "42-hour total playtime, IPX4 water resistance, BEAST Mode for gaming.",
+        features: ["42-hour total playtime", "BEAST Mode gaming", "IPX4 water resistant", "Instant connect", "8mm drivers"],
+        specs: { Battery: "42 hrs", Driver: "8mm", Water: "IPX4", Latency: "60ms" }
+      },
+
+      {
+        id: 9, name: "Apple iPad Pro M4", brand: "Apple", category: "Electronics", price: 109900, originalPrice: 119900, rating: 4.9, reviews: 7231, emoji: "📟", badge: "new", engravable: true,
+        img: "https://m.media-amazon.com/images/I/71gF8Jk0XWL._AC_SX522_.jpg",
+        backImg: "https://m.media-amazon.com/images/I/81uMDMJpHQL._AC_SX522_.jpg",
+        imgs: ["https://m.media-amazon.com/images/I/71gF8Jk0XWL._AC_SX522_.jpg", "https://m.media-amazon.com/images/I/81uMDMJpHQL._AC_SX522_.jpg"],
+        desc: "Impossibly thin iPad with M4 chip. Brilliant 13\" Ultra Retina XDR OLED display.",
+        features: ["M4 chip", "Ultra Retina XDR OLED", "Apple Pencil Pro support", "10-hour battery", "Thunderbolt port"],
+        specs: { Display: '13" OLED', Processor: "M4", Storage: "256GB", Weight: "579g" }
+      },
+
+      // CLOTHING
+      {
+        id: 10, name: "Nike Air Max 270", brand: "Nike", category: "Clothing", price: 10995, originalPrice: 13495, rating: 4.4, reviews: 5421, emoji: "👟", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/61sDJEKuZ6L._AC_UX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/61sDJEKuZ6L._AC_UX522_.jpg"],
+        desc: "Nike's biggest heel Air unit yet for a super-cushioned everyday ride.",
+        features: ["Full-length Max Air", "Mesh upper", "Rubber outsole", "Multiple colorways"],
+        specs: { Material: "Mesh/Synthetic", Sole: "Rubber", Closure: "Lace-up", Care: "Spot clean" }
+      },
+
+      {
+        id: 11, name: "Adidas Ultraboost 22", brand: "Adidas", category: "Clothing", price: 13999, originalPrice: 16999, rating: 4.5, reviews: 4312, emoji: "🥿", badge: "prime", engravable: false,
+        img: "https://m.media-amazon.com/images/I/41PbsxV2qNL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/41PbsxV2qNL._AC_SX522_.jpg"],
+        desc: "Feel the energy return with Adidas Boost technology in every stride.",
+        features: ["Responsive BOOST midsole", "Primeknit+ upper", "Continental rubber outsole", "Linear Energy Push", "Recycled materials"],
+        specs: { Material: "Primeknit", Sole: "Continental", Type: "Running", Drop: "10mm" }
+      },
+
+      {
+        id: 12, name: "Levi's 511 Slim Jeans", brand: "Levi's", category: "Clothing", price: 2999, originalPrice: 3999, rating: 4.5, reviews: 18234, emoji: "👖", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71f5Eu5lJSL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71f5Eu5lJSL._AC_SX522_.jpg"],
+        desc: "Slim fit through seat and thigh. Versatile everyday jean in classic indigo.",
+        features: ["Slim fit", "Mid rise", "Classic 5-pocket", "Stretch denim"],
+        specs: { Fit: "Slim", Rise: "Mid", Material: "98% Cotton 2% Elastane", Care: "Machine Wash" }
+      },
+
+      {
+        id: 13, name: "Zara Floral Midi Dress", brand: "Zara", category: "Clothing", price: 3990, originalPrice: 5990, rating: 4.3, reviews: 3421, emoji: "👗", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/61b8OmWRs6L._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/61b8OmWRs6L._AC_SX522_.jpg"],
+        desc: "Flowy midi dress with all-over floral print. Perfect for summer occasions.",
+        features: ["Floral print", "Midi length", "V-neckline", "Relaxed fit", "Side pockets"],
+        specs: { Material: "100% Viscose", Length: "Midi", Fit: "Relaxed", Care: "Hand Wash" }
+      },
+
+      {
+        id: 14, name: "H&M Oversized Graphic Tee", brand: "H&M", category: "Clothing", price: 799, originalPrice: 1299, rating: 4.1, reviews: 6543, emoji: "👕", badge: "new", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71LQvLgcK5L._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71LQvLgcK5L._AC_SX522_.jpg"],
+        desc: "Relaxed cotton oversized T-shirt with dropped shoulders and graphic print.",
+        features: ["100% cotton jersey", "Oversized fit", "Graphic print", "Dropped shoulders"],
+        specs: { Material: "100% Cotton", Fit: "Oversized", Care: "Machine Wash", Origin: "Bangladesh" }
+      },
+
+      // HOME
+      {
+        id: 15, name: "Instant Pot Duo 7-in-1", brand: "Instant Pot", category: "Home", price: 5999, originalPrice: 8999, rating: 4.6, reviews: 23541, emoji: "🍲", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71V1cCRXtBL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71V1cCRXtBL._AC_SX522_.jpg"],
+        desc: "7-in-1: Pressure Cooker, Slow Cooker, Rice Cooker, Sauté, Steamer, Yogurt Maker.",
+        features: ["7-in-1 functionality", "6 quart capacity", "13 smart programs", "70% faster cooking"],
+        specs: { Capacity: "6 Quart", Wattage: "1000W", Programs: "13", Material: "Stainless Steel" }
+      },
+
+      {
+        id: 16, name: "Dyson V15 Detect Cordless", brand: "Dyson", category: "Home", price: 52900, originalPrice: 62900, rating: 4.7, reviews: 9876, emoji: "🧹", badge: "new", engravable: false,
+        img: "https://m.media-amazon.com/images/I/515Ht8HFTrL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/515Ht8HFTrL._AC_SX522_.jpg"],
+        desc: "Laser reveals hidden dust. Piezo sensor. Most powerful Dyson yet.",
+        features: ["Laser dust detection", "Piezo particle sensor", "60-min runtime", "HEPA filtration", "LCD screen"],
+        specs: { Battery: "60 min", Suction: "230 AW", Filtration: "HEPA", Weight: "3.1 kg" }
+      },
+
+      {
+        id: 17, name: "Prestige Induction Cooktop", brand: "Prestige", category: "Home", price: 2199, originalPrice: 3500, rating: 4.3, reviews: 15432, emoji: "🍳", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/51GMOqy0oWL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/51GMOqy0oWL._AC_SX522_.jpg"],
+        desc: "India's most trusted brand. 2000W with 7 preset menus and feather-touch controls.",
+        features: ["2000W", "7 preset menus", "Feather-touch panel", "Auto voltage regulator"],
+        specs: { Power: "2000W", Menus: "7", Voltage: "220-240V", Color: "Black" }
+      },
+
+      // BOOKS
+      {
+        id: 18, name: "Atomic Habits", brand: "James Clear", category: "Books", price: 349, originalPrice: 599, rating: 4.9, reviews: 142087, emoji: "📗", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/81YkqyaFVEL._AC_SY436_FMwebp_QL65_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/81YkqyaFVEL._AC_SY436_FMwebp_QL65_.jpg"],
+        desc: "#1 NYT bestseller. A proven framework for improving every day.",
+        features: ["10M+ copies sold", "4 laws of behavior change", "Practical strategies", "Real-world case studies"],
+        specs: { Pages: "320", Publisher: "Random House", Language: "English", Format: "Paperback" }
+      },
+
+      {
+        id: 19, name: "The Alchemist", brand: "Paulo Coelho", category: "Books", price: 199, originalPrice: 399, rating: 4.7, reviews: 98765, emoji: "📘", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71aFt4+OTOL._AC_SY436_FMwebp_QL65_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71aFt4+OTOL._AC_SY436_FMwebp_QL65_.jpg"],
+        desc: "A magical story about following your dream and listening to your heart.",
+        features: ["65M+ copies sold", "30+ years bestseller", "Translated into 80 languages"],
+        specs: { Pages: "197", Publisher: "HarperOne", Language: "English", Format: "Paperback" }
+      },
+
+      // SPORTS
+      {
+        id: 20, name: "Liforme Premium Yoga Mat", brand: "Liforme", category: "Sports", price: 2999, originalPrice: 3999, rating: 4.6, reviews: 7654, emoji: "🧘", badge: "prime", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71gSLkbFvxL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71gSLkbFvxL._AC_SX522_.jpg"],
+        desc: "World's most eco-friendly yoga mat with unique AlignForMe system.",
+        features: ["AlignForMe system", "GripForMe surface", "175cm x 68cm", "4.2mm thickness", "Biodegradable"],
+        specs: { Size: "175 x 68 cm", Thickness: "4.2mm", Material: "Natural Rubber", Weight: "2.5 kg" }
+      },
+
+      {
+        id: 21, name: "Yonex Badminton Racket", brand: "Yonex", category: "Sports", price: 3499, originalPrice: 4999, rating: 4.5, reviews: 12456, emoji: "🏸", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/51GqgRlp1eL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/51GqgRlp1eL._AC_SX522_.jpg"],
+        desc: "Astrox series with rotational generator system for steep attacking play.",
+        features: ["Namd flex carbon", "Energy optimum frame", "T-Anchor system", "Even balance"],
+        specs: { Weight: "85g", Balance: "Even", Flex: "Stiff", String: "Pre-strung" }
+      },
+
+      // BEAUTY
+      {
+        id: 22, name: "L'Oréal Revitalift Serum", brand: "L'Oréal", category: "Beauty", price: 899, originalPrice: 1299, rating: 4.4, reviews: 28765, emoji: "🧴", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/51m8DfG-E+L._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/51m8DfG-E+L._AC_SX522_.jpg"],
+        desc: "Pure 1.5% Hyaluronic Acid serum. Clinically proven to reduce wrinkles.",
+        features: ["1.5% Pure Hyaluronic Acid", "3 types of HA", "Clinically tested", "Fragrance-free"],
+        specs: { Volume: "30ml", Type: "Serum", "Skin Type": "All", SPF: "None" }
+      },
+
+      {
+        id: 23, name: "Maybelline Fit Me Foundation", brand: "Maybelline", category: "Beauty", price: 399, originalPrice: 699, rating: 4.3, reviews: 54321, emoji: "🫧", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/61ZSEhzPfkL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/61ZSEhzPfkL._AC_SX522_.jpg"],
+        desc: "Fits your skin tone. Natural matte finish that doesn't clog pores.",
+        features: ["40+ shades", "Matte + Poreless finish", "Dermatologist tested", "SPF 18"],
+        specs: { Volume: "30ml", Finish: "Matte", SPF: "18", Suitable: "Normal to Oily" }
+      },
+
+      // TOYS
+      {
+        id: 24, name: "LEGO Technic Bugatti Chiron", brand: "LEGO", category: "Toys", price: 14999, originalPrice: 17999, rating: 4.8, reviews: 3421, emoji: "🏎️", badge: "new", engravable: false,
+        img: "https://m.media-amazon.com/images/I/91TNQvqvmqL._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/91TNQvqvmqL._AC_SX522_.jpg"],
+        desc: "Build and display the iconic Bugatti Chiron in 1:8 scale with 3,599 pieces.",
+        features: ["3,599 pieces", "1:8 scale", "Working W16 engine", "Functioning gearbox"],
+        specs: { Pieces: "3599", Scale: "1:8", "Age": "16+", Theme: "Technic" }
+      },
+
+      {
+        id: 25, name: "Hot Wheels 20-Car Gift Pack", brand: "Hot Wheels", category: "Toys", price: 699, originalPrice: 999, rating: 4.6, reviews: 45678, emoji: "🚗", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/81r5JxP9o3L._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/81r5JxP9o3L._AC_SX522_.jpg"],
+        desc: "20 Hot Wheels die-cast vehicles, 1:64 scale. Great starter set.",
+        features: ["20 vehicles", "1:64 scale die-cast", "Multiple styles", "Collectible"],
+        specs: { Scale: "1:64", Count: "20 cars", "Age": "3+", Material: "Die-cast Metal" }
+      },
+
+      // GARDEN
+      {
+        id: 26, name: "Himalayan Pink Salt Lamp", brand: "Amber", category: "Garden", price: 799, originalPrice: 1499, rating: 4.1, reviews: 32145, emoji: "🏮", badge: "sale", engravable: false,
+        img: "https://m.media-amazon.com/images/I/71F9IpEWR6L._AC_SX522_.jpg",
+        backImg: "", imgs: ["https://m.media-amazon.com/images/I/71F9IpEWR6L._AC_SX522_.jpg"],
+        desc: "100% authentic Himalayan rock salt lamp. Air purify naturally.",
+        features: ["100% authentic salt", "Dimmer switch", "Wooden base", "15W bulb included"],
+        specs: { Weight: "2-4 kg", "Bulb": "15W", "Base": "Wooden", Size: "6-8 inch" }
+      },
+    ];
+
+    // ══════════════════════════════════════════
+    // STATE
+    // ══════════════════════════════════════════
+    let cart = JSON.parse(localStorage.getItem('sw_cart2') || '[]');
+    let wishlist = JSON.parse(localStorage.getItem('sw_wish2') || '[]');
+    let user = JSON.parse(localStorage.getItem('sw_user2') || 'null');
+    let currentFilter = '';
+    let currentProduct = null;
+
+    // Engraving state
+    let engProduct = null;
+    let engText = '';
+    let engFontIdx = 0;
+    let engColor = '#FFD700';
+    let engSize = 22;
+    let engOpacity = 0.90;
+    let engEffect = 'laser';
+    let engXPct = 0.5;  // 0–1 relative X
+    let engYPct = 0.78; // 0–1 relative Y
+    let engCachedImg = null;
+    let engCachedBackImg = null;
+    let engView = 'back'; // 'back' or 'front'
+    let isDragging = false;
+    let rafPending = false;
+
+    // ══════════════════════════════════════════
+    // UTILS
+    // ══════════════════════════════════════════
+    const saveCart = () => { localStorage.setItem('sw_cart2', JSON.stringify(cart)); updateCartCount(); };
+    const saveWish = () => localStorage.setItem('sw_wish2', JSON.stringify(wishlist));
+    const saveUser = () => localStorage.setItem('sw_user2', JSON.stringify(user));
+    const fmtP = p => '₹' + p.toLocaleString('en-IN');
+    const starsStr = r => '★'.repeat(Math.floor(r)) + '☆'.repeat(5 - Math.floor(r)) + ' ' + r;
+    const updateCartCount = () => document.getElementById('cart-count').textContent = cart.reduce((a, i) => a + i.qty, 0);
+    const toast = (msg, dur = 3200) => { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), dur); };
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function setActiveNav(el) { document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
+
+    function showPage(pg) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pg + '-page').classList.add('active');
+      window.scrollTo(0, 0);
+      if (pg === 'cart') renderCart();
+      if (pg === 'checkout') renderCheckout();
+      if (pg === 'profile') renderProfile();
+    }
+
+    // ══════════════════════════════════════════
+    // ENGRAVING CANVAS ENGINE
+    // ══════════════════════════════════════════
+    async function loadImg(url) { return new Promise(res => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => res(null); i.src = url; }); }
+
+    function drawBase(ctx, img, w, h, p, dark = true) {
+      // Premium dark gradient background simulating metal/device back
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      if (dark) {
+        bg.addColorStop(0, '#1c1c24');
+        bg.addColorStop(0.4, '#23232e');
+        bg.addColorStop(1, '#141418');
+      } else {
+        bg.addColorStop(0, '#e8e8ec');
+        bg.addColorStop(1, '#d0d0d8');
+      }
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      // Subtle metal texture — horizontal highlights
+      for (let y = 0; y < h; y += 2) {
+        ctx.fillStyle = `rgba(255,255,255,${0.01 + Math.sin(y / 8) * 0.008})`;
+        ctx.fillRect(0, y, w, 1);
+      }
+
+      if (img) {
+        // Center the product image with slight padding
+        const aspect = img.naturalWidth / img.naturalHeight;
+        let dw = w * 0.80, dh = dw / aspect;
+        if (dh > h * 0.80) { dh = h * 0.80; dw = dh * aspect; }
+        const dx = (w - dw) / 2, dy = (h - dh) / 2;
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        try { ctx.drawImage(img, dx, dy, dw, dh); } catch (e) { }
+        ctx.restore();
+        // Subtle reflection glow under product
+        const grd = ctx.createRadialGradient(w / 2, h * 0.85, 0, w / 2, h * 0.85, w * 0.35);
+        grd.addColorStop(0, 'rgba(255,255,255,0.07)');
+        grd.addColorStop(1, 'transparent');
+        ctx.fillStyle = grd; ctx.fillRect(0, 0, w, h);
+      } else {
+        ctx.font = `${w * 0.28}px serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillText(p.emoji, w / 2, h / 2);
+      }
+    }
+
+    function drawRealisticEngraving(ctx, text, x, y, fontIdx, color, size, opacity, effect) {
+      if (!text || !text.trim()) return;
+      const f = FONTS[fontIdx];
+      ctx.save();
+      ctx.font = f.fn(size);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const metrics = ctx.measureText(text);
+      const tw = metrics.width;
+
+      // Parse color to RGB for manipulation
+      const r = parseInt(color.slice(1, 3), 16), g = parseInt(color.slice(3, 5), 16), b = parseInt(color.slice(5, 7), 16);
+
+      if (effect === 'laser') {
+        // LASER ENGRAVING: burned-in look with heat glow
+        // Outer heat haze
+        ctx.shadowColor = color;
+        ctx.shadowBlur = size * 0.8;
+        ctx.fillStyle = `rgba(${r},${g},${b},${opacity * 0.15})`;
+        ctx.fillText(text, x, y);
+        ctx.shadowBlur = 0;
+
+        // Scorched depth shadow (dark burn below)
+        ctx.fillStyle = `rgba(0,0,0,0.7)`;
+        ctx.fillText(text, x + 1.5, y + 1.5);
+
+        // Main engraved text with metallic sheen
+        const grad = ctx.createLinearGradient(x - tw / 2, y - size / 2, x + tw / 2, y + size / 2);
+        grad.addColorStop(0, `rgba(${Math.min(255, r + 60)},${Math.min(255, g + 60)},${Math.min(255, b + 60)},${opacity})`);
+        grad.addColorStop(0.4, `rgba(${r},${g},${b},${opacity})`);
+        grad.addColorStop(0.7, `rgba(${Math.min(255, r + 80)},${Math.min(255, g + 80)},${Math.min(255, b + 80)},${opacity * 0.9})`);
+        grad.addColorStop(1, `rgba(${r},${g},${b},${opacity * 0.8})`);
+        ctx.fillStyle = grad;
+        ctx.fillText(text, x, y);
+
+        // Thin bright highlight line across middle of text
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.fillStyle = `rgba(${Math.min(255, r + 100)},${Math.min(255, g + 100)},${Math.min(255, b + 100)},0.3)`;
+        ctx.fillText(text, x, y - size * 0.06);
+        ctx.restore();
+
+        // Decorative laser score line
+        ctx.strokeStyle = `rgba(${r},${g},${b},${opacity * 0.6})`;
+        ctx.lineWidth = 0.8;
+        ctx.shadowColor = color; ctx.shadowBlur = 4;
+        ctx.beginPath(); ctx.moveTo(x - tw / 2 - 8, y + size * 0.55); ctx.lineTo(x + tw / 2 + 8, y + size * 0.55); ctx.stroke();
+        ctx.shadowBlur = 0;
+
+      } else if (effect === 'emboss') {
+        // EMBOSSED: raised 3D effect
+        // Dark shadow for depth
+        ctx.fillStyle = 'rgba(0,0,0,0.8)';
+        ctx.fillText(text, x + 3, y + 3);
+        // Mid shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillText(text, x + 1.5, y + 1.5);
+        // Main color
+        ctx.fillStyle = `rgba(${r},${g},${b},${opacity})`;
+        ctx.fillText(text, x, y);
+        // Highlight (light from top-left)
+        ctx.fillStyle = `rgba(255,255,255,0.5)`;
+        ctx.fillText(text, x - 1, y - 1);
+
+      } else if (effect === 'neon') {
+        // NEON GLOW: bright neon sign look
+        ctx.shadowColor = color; ctx.shadowBlur = size * 1.5;
+        ctx.fillStyle = `rgba(${r},${g},${b},0.3)`;
+        ctx.fillText(text, x, y);
+        ctx.shadowBlur = size * 0.8;
+        ctx.fillStyle = `rgba(${r},${g},${b},0.6)`;
+        ctx.fillText(text, x, y);
+        ctx.shadowBlur = size * 0.3;
+        ctx.fillStyle = `rgba(${Math.min(255, r + 80)},${Math.min(255, g + 80)},${Math.min(255, b + 80)},${opacity})`;
+        ctx.fillText(text, x, y);
+        // Inner bright core
+        ctx.shadowBlur = 3;
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fillText(text, x, y);
+
+      } else if (effect === 'deboss') {
+        // DEBOSSED: pressed-into-surface look
+        // Outer ambient occlusion
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillText(text, x, y);
+        // Highlight on bottom edge (light coming from below depression)
+        ctx.fillStyle = `rgba(${Math.min(255, r + 100)},${Math.min(255, g + 100)},${Math.min(255, b + 100)},0.4)`;
+        ctx.fillText(text, x, y + 2);
+        // Darker top (depth)
+        ctx.fillStyle = `rgba(0,0,0,0.9)`;
+        ctx.fillText(text, x, y - 1);
+        // Main pressed color
+        ctx.fillStyle = `rgba(${r},${g},${b},${opacity * 0.7})`;
+        ctx.fillText(text, x, y);
+      }
+
+      ctx.restore();
+    }
+
+    async function renderMainCanvas() {
+      const canvas = document.getElementById('eng-canvas');
+      if (!canvas || !engProduct) return;
+      const W = 380, H = 380;
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      const img = (engView === 'back' && engCachedBackImg) ? engCachedBackImg : engCachedImg;
+      drawBase(ctx, img, W, H, engProduct, true);
+
+      if (engView === 'back') {
+        if (engText.trim()) {
+          const x = engXPct * W, y = engYPct * H;
+          drawRealisticEngraving(ctx, engText, x, y, engFontIdx, engColor, engSize, engOpacity, engEffect);
+        } else {
+          // Ghost hint
+          ctx.fillStyle = 'rgba(124,58,237,0.3)';
+          ctx.font = "bold 13px 'Outfit',sans-serif";
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('Type text → see live engraving', W / 2, H * 0.82);
+          // Dotted circle where text will appear
+          ctx.strokeStyle = 'rgba(124,58,237,0.25)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath(); ctx.arc(W / 2, H * 0.78, 40, 0, Math.PI * 2); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      } else {
+        // Front view: just product image with a note
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.font = "bold 11px 'Outfit',sans-serif";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText('← Switch to Back for engraving', W / 2, H - 12);
+      }
+
+      // Update compare canvases
+      renderCompare();
+      // Update drag handle
+      updateDragHandle();
+    }
+
+    function renderCompare() {
+      const W = 110, H = 110;
+      // Before
+      const bc = document.getElementById('cmp-before');
+      if (bc) {
+        bc.width = W; bc.height = H;
+        const ctx = bc.getContext('2d');
+        const img = engCachedBackImg || engCachedImg;
+        drawBase(ctx, img, W, H, engProduct, true);
+      }
+      // After
+      const ac = document.getElementById('cmp-after');
+      if (ac) {
+        ac.width = W; ac.height = H;
+        const ctx = ac.getContext('2d');
+        const img = engCachedBackImg || engCachedImg;
+        drawBase(ctx, img, W, H, engProduct, true);
+        if (engText.trim()) {
+          drawRealisticEngraving(ctx, engText, W / 2, H * 0.75, engFontIdx, engColor, Math.max(10, engSize * 0.5), engOpacity, engEffect);
+        }
+      }
+    }
+
+    function scheduleRender() {
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => { rafPending = false; renderMainCanvas(); });
+    }
+
+    function updateDragHandle() {
+      const canvas = document.getElementById('eng-canvas');
+      const handle = document.getElementById('drag-handle');
+      if (!canvas || !handle) return;
+      const rect = canvas.getBoundingClientRect();
+      const cw = canvas.clientWidth, ch = canvas.clientHeight;
+      handle.style.left = (engXPct * cw) + 'px';
+      handle.style.top = (engYPct * ch) + 'px';
+    }
+
+    // Drag logic
+    function initDragHandle() {
+      const dot = document.getElementById('drag-dot');
+      const canvas = document.getElementById('eng-canvas');
+      if (!dot || !canvas) return;
+
+      function getCanvasXY(clientX, clientY) {
+        const r = canvas.getBoundingClientRect();
+        return {
+          x: Math.max(0.05, Math.min(0.95, (clientX - r.left) / r.width)),
+          y: Math.max(0.05, Math.min(0.95, (clientY - r.top) / r.height))
+        };
+      }
+
+      dot.addEventListener('mousedown', e => { isDragging = true; e.preventDefault(); });
+      document.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const p = getCanvasXY(e.clientX, e.clientY);
+        engXPct = p.x; engYPct = p.y;
+        updateDragHandle(); scheduleRender();
+      });
+      document.addEventListener('mouseup', () => { isDragging = false; });
+
+      // Touch
+      dot.addEventListener('touchstart', e => { isDragging = true; e.preventDefault(); }, { passive: false });
+      document.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        const t = e.touches[0];
+        const p = getCanvasXY(t.clientX, t.clientY);
+        engXPct = p.x; engYPct = p.y;
+        updateDragHandle(); scheduleRender();
+      }, { passive: true });
+      document.addEventListener('touchend', () => { isDragging = false; });
+    }
+
+    // ══════════════════════════════════════════
+    // ENGRAVING STUDIO OPEN/CLOSE
+    // ══════════════════════════════════════════
+    async function openEngravingStudio(productId, ev) {
+      if (ev) { ev.stopPropagation(); }
+      engProduct = PRODUCTS.find(x => x.id === productId);
+      if (!engProduct) return;
+
+      // Reset
+      engText = ''; engFontIdx = 0; engColor = '#FFD700'; engSize = 22; engOpacity = 0.90; engEffect = 'laser';
+      engXPct = 0.5; engYPct = 0.78; engView = 'back';
+
+      // Reset UI
+      document.getElementById('eng-text').value = '';
+      document.getElementById('eng-char-fill').style.width = '0%';
+      document.getElementById('eng-char-left').textContent = '20';
+      document.getElementById('size-slider').value = 22;
+      document.getElementById('size-val').textContent = '22px';
+      document.getElementById('opacity-slider').value = 90;
+      document.getElementById('opacity-val').textContent = '90%';
+      document.querySelectorAll('.font-opt').forEach((e, i) => e.classList.toggle('sel', i === 0));
+      document.querySelectorAll('.clr').forEach(e => e.classList.toggle('sel', e.dataset.c === '#FFD700'));
+      document.querySelectorAll('.effect-opt').forEach(e => e.classList.toggle('sel', e.dataset.e === 'laser'));
+      document.querySelectorAll('.view-btn').forEach(e => e.classList.toggle('sel', e.id === 'vb-back'));
+
+      document.getElementById('eng-product-subtitle').textContent = `Personalise your ${engProduct.name}`;
+      document.getElementById('eng-prod-name').textContent = engProduct.name;
+      document.getElementById('eng-prod-brand').textContent = engProduct.brand;
+      document.getElementById('pb-base').textContent = fmtP(engProduct.price);
+      document.getElementById('pb-total').textContent = fmtP(engProduct.price + ENGRAVE_CHARGE);
+
+      document.getElementById('eng-overlay').classList.add('open');
+
+      // Load images
+      [engCachedImg, engCachedBackImg] = await Promise.all([
+        loadImg(engProduct.img),
+        engProduct.backImg ? loadImg(engProduct.backImg) : Promise.resolve(null)
+      ]);
+      if (!engCachedBackImg) engCachedBackImg = engCachedImg;
+
+      initDragHandle();
+      scheduleRender();
+    }
+
+    function closeEngravingStudio() {
+      document.getElementById('eng-overlay').classList.remove('open');
+    }
+
+    function onEngTextInput() {
+      const v = document.getElementById('eng-text').value.slice(0, 20);
+      document.getElementById('eng-text').value = v;
+      engText = v;
+      const pct = (v.length / 20) * 100;
+      document.getElementById('eng-char-fill').style.width = pct + '%';
+      document.getElementById('eng-char-left').textContent = 20 - v.length;
+      scheduleRender();
+    }
+
+    function pickFont(idx, el) {
+      engFontIdx = idx;
+      document.querySelectorAll('.font-opt').forEach(e => e.classList.remove('sel'));
+      el.classList.add('sel');
+      scheduleRender();
+    }
+
+    function onSizeChange() {
+      engSize = +document.getElementById('size-slider').value;
+      document.getElementById('size-val').textContent = engSize + 'px';
+      scheduleRender();
+    }
+
+    function onOpacityChange() {
+      engOpacity = document.getElementById('opacity-slider').value / 100;
+      document.getElementById('opacity-val').textContent = Math.round(engOpacity * 100) + '%';
+      scheduleRender();
+    }
+
+    function pickColor(c, el) {
+      engColor = c;
+      document.querySelectorAll('.clr').forEach(e => e.classList.remove('sel'));
+      el.classList.add('sel');
+      scheduleRender();
+    }
+
+    function pickEffect(e, el) {
+      engEffect = e;
+      document.querySelectorAll('.effect-opt').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+      scheduleRender();
+    }
+
+    function setView(v, el) {
+      engView = v;
+      document.querySelectorAll('.view-btn').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+      scheduleRender();
+    }
+
+    function confirmEngraving() {
+      if (!engText.trim()) { toast('⚠️ Please enter text to engrave'); return; }
+      const snap = { text: engText, fontIdx: engFontIdx, color: engColor, size: engSize, opacity: engOpacity, effect: engEffect, xPct: engXPct, yPct: engYPct };
+      const existing = cart.find(x => x.id === engProduct.id && x.engraving);
+      if (existing) { existing.qty += 1; existing.engraving = snap; }
+      else cart.push({ id: engProduct.id, qty: 1, engraving: snap });
+      saveCart(); closeEngravingStudio();
+      toast(`✨ "${engText}" engraved! +₹499`);
+    }
+
+    // Mini canvas for cart preview
+    async function drawCartMini(canvasEl, p, eng) {
+      const img = await loadImg(p.backImg || p.img);
+      const W = 56, H = 56; canvasEl.width = W; canvasEl.height = H;
+      const ctx = canvasEl.getContext('2d');
+      drawBase(ctx, img, W, H, p, true);
+      if (eng && eng.text) {
+        const x = (eng.xPct || 0.5) * W, y = (eng.yPct || 0.75) * H;
+        drawRealisticEngraving(ctx, eng.text, x, y, eng.fontIdx || 0, eng.color || '#FFD700', Math.max(8, eng.size * 0.4), eng.opacity || 0.9, eng.effect || 'laser');
+      }
+    }
+
+    // ══════════════════════════════════════════
+    // AUTH
+    // ══════════════════════════════════════════
+    function handleAuthClick() { user ? showPage('profile') : openModal('auth-modal'); }
+    function switchTab(tab, ev) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      ev.target.classList.add('active');
+      document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+    }
+    function doLogin() {
+      const email = document.getElementById('login-email').value, pass = document.getElementById('login-password').value;
+      if (!email || !pass) { toast('⚠️ Please fill all fields'); return; }
+      user = { name: email.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, c => c.toUpperCase()), email };
+      saveUser(); updateAuthUI(); closeModal('auth-modal'); toast('👋 Welcome back, ' + user.name.split(' ')[0] + '!');
+    }
+    function doRegister() {
+      const name = document.getElementById('reg-name').value, email = document.getElementById('reg-email').value, pass = document.getElementById('reg-password').value;
+      if (!name || !email || !pass) { toast('⚠️ Fill all fields'); return; }
+      if (pass.length < 6) { toast('⚠️ Password ≥ 6 chars'); return; }
+      user = { name, email }; saveUser(); updateAuthUI(); closeModal('auth-modal'); toast('🎉 Welcome, ' + name.split(' ')[0] + '!');
+    }
+    function updateAuthUI() {
+      const btn = document.getElementById('auth-btn');
+      btn.innerHTML = user ? `<span class="small">Hello, ${user.name.split(' ')[0]}</span><span class="big">Account & Orders</span>` : `<span class="small">Hello, Sign in</span><span class="big">Account &amp; Orders</span>`;
+    }
+    function doLogout() { user = null; localStorage.removeItem('sw_user2'); updateAuthUI(); renderProfile(); toast('👋 Signed out'); }
+
+    // ══════════════════════════════════════════
+    // PRODUCT GRID
+    // ══════════════════════════════════════════
+    function getFiltered() {
+      let list = [...PRODUCTS];
+      if (currentFilter) list = list.filter(p => p.category === currentFilter);
+      const price = document.getElementById('price-filter').value;
+      if (price) { const [mn, mx] = price.split('-').map(Number); list = list.filter(p => p.price >= mn && p.price <= mx); }
+      const rating = document.getElementById('rating-filter').value;
+      if (rating) list = list.filter(p => p.rating >= +rating);
+      const sort = document.getElementById('sort-select').value;
+      if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
+      else if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
+      else if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
+      else if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
+      return list;
+    }
+
+    function renderProducts() {
+      const list = getFiltered();
+      document.getElementById('results-count').textContent = `${list.length} result${list.length !== 1 ? 's' : ''}`;
+      document.getElementById('product-grid').innerHTML = list.map(productCard).join('');
+    }
+
+    function productCard(p) {
+      const disc = Math.round((1 - p.price / p.originalPrice) * 100), inWish = wishlist.includes(p.id);
+      return `<div class="product-card" onclick="openProduct(${p.id})">
+    <div class="product-img-wrap">
+      <img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+      ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge === 'prime' ? '⚡ PRIME' : p.badge === 'sale' ? `-${disc}%` : p.badge.toUpperCase()}</span>` : ''}
+      ${p.engravable ? `<span class="badge-engrave">✍️ Engravable</span>` : ''}
+      <button class="wishlist-btn${inWish ? ' active' : ''}" onclick="toggleWish(event,${p.id})">${inWish ? '❤️' : '🤍'}</button>
+    </div>
+    <div class="product-info">
+      <div class="product-brand">${p.brand}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="stars">${starsStr(p.rating)}</div>
+      <div class="reviews-count">(${p.reviews.toLocaleString()} reviews)</div>
+      <div class="price-row">
+        <span class="price">${fmtP(p.price)}</span>
+        <span class="price-original">${fmtP(p.originalPrice)}</span>
+        <span class="discount">-${disc}%</span>
+      </div>
+      ${p.engravable ? `<div class="engrave-tag">✍️ Laser Engrave · +₹499</div>` : ''}
+      <div class="card-btns">
+        <button class="atc-btn" onclick="addToCart(event,${p.id})">Add to Cart</button>
+        ${p.engravable ? `<button class="engrave-btn" onclick="openEngravingStudio(${p.id},event)">✍️ Engrave</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function filterCat(cat) {
+      currentFilter = cat;
+      document.getElementById('cat-select').value = cat;
+      document.getElementById('products-heading').textContent = cat + ' Products';
+      renderProducts(); showPage('home');
+      setTimeout(() => document.getElementById('shop-now').scrollIntoView({ behavior: 'smooth' }), 120);
+    }
+    function filterFromSelect() {
+      currentFilter = document.getElementById('cat-select').value;
+      document.getElementById('products-heading').textContent = currentFilter ? currentFilter + ' Products' : 'Featured Products';
+      renderProducts();
+    }
+
+    // ══════════════════════════════════════════
+    // SEARCH
+    // ══════════════════════════════════════════
+    function doSearch() {
+      const q = document.getElementById('search-input').value.trim().toLowerCase();
+      const cat = document.getElementById('search-category').value;
+      if (!q) { toast('Enter a search term'); return; }
+      const results = PRODUCTS.filter(p => {
+        const m = p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.desc && p.desc.toLowerCase().includes(q));
+        return m && (cat === 'All' || p.category === cat);
+      });
+      document.getElementById('search-header').innerHTML = `Showing <strong>${results.length}</strong> results for "<strong>${q}</strong>"${cat !== 'All' ? ' in <strong>' + cat + '</strong>' : ''}`;
+      document.getElementById('search-grid').innerHTML = results.length ? results.map(productCard).join('') : `<div style="padding:60px 20px;text-align:center;grid-column:1/-1;color:var(--text2)"><div style="font-size:50px;margin-bottom:14px">🔍</div><h3 style="font-size:20px;margin-bottom:8px">No results</h3><p>Try different keywords.</p></div>`;
+      showPage('search');
+    }
+
+    // ══════════════════════════════════════════
+    // PRODUCT DETAIL
+    // ══════════════════════════════════════════
+    function openProduct(id) {
+      const p = PRODUCTS.find(x => x.id === id);
+      currentProduct = p;
+      const disc = Math.round((1 - p.price / p.originalPrice) * 100), inWish = wishlist.includes(p.id);
+      document.getElementById('breadcrumb').innerHTML = `<span onclick="showPage('home')">Home</span><span class="sep">›</span><span onclick="filterCat('${p.category}')">${p.category}</span><span class="sep">›</span><span>${p.name.substring(0, 30)}</span>`;
+      document.getElementById('detail-content').innerHTML = `
+    <div class="detail-layout">
+      <div class="detail-images">
+        <div class="main-img-box" id="main-img">
+          <img src="${p.img}" alt="${p.name}" style="max-width:100%;max-height:280px;object-fit:contain" onerror="this.outerHTML='<span style=\\"font-size:80px\\">${p.emoji}</span>'">
+        </div>
+        <div class="thumb-row">
+          ${(p.imgs || [p.img]).map((u, i) => `<div class="thumb${i === 0 ? ' active' : ''}" onclick="selThumb(this,'${u}','${p.emoji}')"><img src="${u}" onerror="this.parentElement.innerHTML='<span style=\\"font-size:18px\\">${p.emoji}</span>'"></div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="detail-brand">${p.brand}</div>
+        <h1 class="detail-title">${p.name}</h1>
+        <div class="detail-rating">
+          <span class="stars" style="font-size:15px">${'★'.repeat(Math.floor(p.rating))}${'☆'.repeat(5 - Math.floor(p.rating))}</span>
+          <span style="color:var(--blue);font-size:13px">${p.rating} · ${p.reviews.toLocaleString()} ratings</span>
+        </div>
+        <div class="detail-price">
+          <div class="current">${fmtP(p.price)}</div>
+          <div class="was">M.R.P.: <s>${fmtP(p.originalPrice)}</s> &nbsp;<span style="color:var(--red);font-weight:700">Save ${fmtP(p.originalPrice - p.price)} (${disc}%)</span></div>
+        </div>
+        ${p.engravable ? `<div class="engrave-promo"><span style="font-size:28px">✍️</span><div><h4>Laser Engraving Studio</h4><p>Realistic preview · Drag &amp; drop · 4 effects · +₹499</p></div><button class="ep-btn" onclick="openEngravingStudio(${p.id})">Open Studio</button></div>` : ''}
+        <div class="detail-desc">${p.desc}</div>
+        <ul class="detail-features">${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
+        <div class="spec-grid">${Object.entries(p.specs).map(([k, v]) => `<div class="spec-item"><span class="spec-label">${k}</span><span class="spec-value">${v}</span></div>`).join('')}</div>
+      </div>
+      <div class="buy-box">
+        <div class="price">${fmtP(p.price)}</div>
+        <div style="color:var(--red);font-size:12px;font-weight:700;margin-bottom:8px">-${disc}% Limited time</div>
+        <div class="delivery-info"><div class="fast">⚡ FREE Delivery Tomorrow</div><div style="font-size:11px;color:var(--text2);margin-top:3px">Order within 3 hrs 45 min</div></div>
+        <div class="stock-status in">✅ In Stock</div>
+        <div class="qty-row"><label style="font-size:12px;font-weight:600">Qty:</label><select class="qty-select" id="detail-qty">${[1, 2, 3, 4, 5].map(n => `<option>${n}</option>`).join('')}</select></div>
+        <div class="buy-btns">
+          <button class="buy-btn cart" onclick="addToCartDetail()">Add to Cart</button>
+          <button class="buy-btn now" onclick="buyNow()">Buy Now</button>
+          ${p.engravable ? `<button class="buy-btn custom" onclick="openEngravingStudio(${p.id})">✍️ Open Engraving Studio (+₹499)</button>` : ''}
+          <button class="buy-btn wish" id="dwish" onclick="toggleWishDetail(${p.id})">${inWish ? '❤️ Saved to Wishlist' : '🤍 Add to Wishlist'}</button>
+        </div>
+        ${p.engravable ? `<div class="custom-pricing-box"><div style="font-weight:800;font-size:11px;color:var(--purple-dark);margin-bottom:5px">✍️ Engraving Pricing</div><div style="font-size:12px;color:var(--text2)">Base: <strong>${fmtP(p.price)}</strong></div><div style="font-size:12px;color:var(--purple)">+ Laser Engraving: <strong>₹499</strong></div><div style="font-size:13px;font-weight:800;border-top:1px solid var(--purple-border);margin-top:5px;padding-top:5px">Total: <strong>${fmtP(p.price + ENGRAVE_CHARGE)}</strong></div></div>` : ''}
+        <div class="secure-badge">🔒 Secure Transaction · Easy Returns</div>
+      </div>
+    </div>`;
+      showPage('product-detail');
+    }
+
+    function selThumb(el, u, fb) {
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('main-img').innerHTML = `<img src="${u}" style="max-width:100%;max-height:280px;object-fit:contain" onerror="this.outerHTML='<span style=\\"font-size:80px\\">${fb}</span>'">`;
+    }
+    function addToCartDetail() { addToCartById(currentProduct.id, +document.getElementById('detail-qty').value); }
+    function buyNow() { addToCartDetail(); showPage('checkout'); }
+
+    // ══════════════════════════════════════════
+    // CART
+    // ══════════════════════════════════════════
+    function addToCart(e, id) { e.stopPropagation(); addToCartById(id, 1); }
+    function addToCartById(id, qty = 1) {
+      const p = PRODUCTS.find(x => x.id === id);
+      const ex = cart.find(x => x.id === id && !x.engraving);
+      if (ex) ex.qty += qty; else cart.push({ id, qty });
+      saveCart(); toast(`🛒 Added: ${p.name.substring(0, 28)}`);
+    }
+    function updateQty(id, delta, isEng) {
+      const item = isEng ? cart.find(x => x.id === id && x.engraving) : cart.find(x => x.id === id && !x.engraving);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart.splice(cart.indexOf(item), 1);
+      saveCart(); renderCart();
+    }
+    function removeFromCart(id, isEng) {
+      const idx = isEng ? cart.findIndex(x => x.id === id && x.engraving) : cart.findIndex(x => x.id === id && !x.engraving);
+      if (idx > -1) cart.splice(idx, 1);
+      saveCart(); renderCart(); toast('🗑️ Item removed');
+    }
+
+    function renderCart() {
+      const el = document.getElementById('cart-items'), se = document.getElementById('cart-summary-content');
+      if (!cart.length) {
+        el.innerHTML = '<div style="text-align:center;padding:50px 20px"><div style="font-size:56px;margin-bottom:14px">🛒</div><h3 style="font-size:18px;font-weight:800;margin-bottom:8px">Your cart is empty</h3><p style="color:var(--text2);margin-bottom:18px">Add items to get started.</p><button class="btn btn-primary" onclick="showPage(\'home\')">Start Shopping</button></div>';
+        se.innerHTML = '<p style="color:var(--text2);font-size:13px">Add items to see summary</p>';
+        document.querySelector('#cart-page .checkout-btn').style.display = 'none'; return;
+      }
+      document.querySelector('#cart-page .checkout-btn').style.display = 'block';
+      let sub = 0, origSub = 0, engTotal = 0;
+      el.innerHTML = cart.map(item => {
+        const p = PRODUCTS.find(x => x.id === item.id);
+        const ec = item.engraving ? ENGRAVE_CHARGE * item.qty : 0;
+        const tot = p.price * item.qty + ec; sub += tot; origSub += p.originalPrice * item.qty;
+        if (item.engraving) engTotal += ec;
+        const iE = !!item.engraving;
+        const cpv = iE ? `<div class="cart-engrave-preview"><canvas id="cep-${p.id}"></canvas></div>` : '';
+        return `<div class="cart-item">
+      <div class="cart-item-img"><img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>
+      ${cpv}
+      <div class="cart-item-info">
+        <div class="cart-item-name" onclick="openProduct(${p.id})">${p.name}</div>
+        <div class="cart-item-brand">${p.brand} · ${p.category}</div>
+        ${iE ? `<div class="cart-item-engrave">✍️ Engraved: "${item.engraving.text}" · ${FONTS[item.engraving.fontIdx || 0].name} · +₹${ENGRAVE_CHARGE}</div>` : ''}
+        <div class="cart-item-meta">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="updateQty(${p.id},-1,${iE})">−</button>
+            <span class="qty-display">${item.qty}</span>
+            <button class="qty-btn" onclick="updateQty(${p.id},1,${iE})">+</button>
+          </div>
+          <button class="remove-btn" onclick="removeFromCart(${p.id},${iE})">Delete</button>
+        </div>
+      </div>
+      <div class="cart-item-price">
+        <div class="amount">${fmtP(tot)}</div>
+        ${item.qty > 1 ? `<div style="font-size:11px;color:var(--text2)">${fmtP(p.price + (iE ? ENGRAVE_CHARGE : 0))} each</div>` : ''}
+        ${iE ? `<div style="font-size:10px;color:var(--purple);font-weight:600">incl. ✍️ engraving</div>` : ''}
+      </div>
+    </div>`;
+      }).join('');
+      // Draw cart previews
+      cart.filter(i => i.engraving).forEach(async item => {
+        const p = PRODUCTS.find(x => x.id === item.id);
+        const c = document.getElementById(`cep-${p.id}`);
+        if (c) await drawCartMini(c, p, item.engraving);
+      });
+      const delivery = sub > 499 ? 0 : 49, baseSav = origSub - (sub - engTotal);
+      se.innerHTML = `
+    <div class="summary-row"><span>Subtotal (${cart.reduce((a, i) => a + i.qty, 0)} items)</span><span>${fmtP(sub)}</span></div>
+    ${engTotal ? `<div class="summary-row" style="color:var(--purple);font-weight:700"><span>✍️ Engraving charges</span><span>${fmtP(engTotal)}</span></div>` : ''}
+    <div class="summary-row savings"><span>💰 You Save</span><span>-${fmtP(baseSav)}</span></div>
+    <div class="summary-row"><span>Delivery</span><span>${delivery ? fmtP(delivery) : '<span style="color:var(--green);font-weight:700">FREE</span>'}</span></div>
+    <div class="summary-row total"><span>Order Total</span><span>${fmtP(sub + delivery)}</span></div>`;
+    }
+
+    // ══════════════════════════════════════════
+    // WISHLIST
+    // ══════════════════════════════════════════
+    function toggleWish(e, id) {
+      e.stopPropagation(); const btn = e.currentTarget;
+      if (wishlist.includes(id)) { wishlist = wishlist.filter(x => x !== id); btn.textContent = '🤍'; btn.classList.remove('active'); toast('Removed from wishlist'); }
+      else { wishlist.push(id); btn.textContent = '❤️'; btn.classList.add('active'); toast('❤️ Added to wishlist'); }
+      saveWish();
+    }
+    function toggleWishDetail(id) {
+      const btn = document.getElementById('dwish');
+      if (wishlist.includes(id)) { wishlist = wishlist.filter(x => x !== id); btn.textContent = '🤍 Add to Wishlist'; toast('Removed from wishlist'); }
+      else { wishlist.push(id); btn.textContent = '❤️ Saved to Wishlist'; toast('❤️ Saved to wishlist'); }
+      saveWish();
+    }
+
+    // ══════════════════════════════════════════
+    // CHECKOUT
+    // ══════════════════════════════════════════
+    function selectPayment(el) { document.querySelectorAll('.payment-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); el.querySelector('input').checked = true; }
+
+    function renderCheckout() {
+      if (!cart.length) { showPage('cart'); return; }
+      let sub = 0;
+      const itemsHTML = cart.map(item => {
+        const p = PRODUCTS.find(x => x.id === item.id);
+        const ec = item.engraving ? ENGRAVE_CHARGE * item.qty : 0;
+        const tot = p.price * item.qty + ec; sub += tot;
+        return `<div class="os-item">
+      <div class="os-item-img"><img src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<span>${p.emoji}</span>'"></div>
+      <div><div class="os-item-name">${p.name.substring(0, 26)}</div>
+        <div style="color:var(--text2);font-size:10px">Qty: ${item.qty}${item.engraving ? ` &nbsp;<span style="color:var(--purple);font-weight:700">✍️ "${item.engraving.text}"</span>` : ''}</div>
+      </div>
+      <span class="os-item-price">${fmtP(tot)}</span>
+    </div>`;
+      }).join('');
+      const delivery = sub > 499 ? 0 : 49, disc = Math.round(sub * 0.05), total = sub + delivery - disc;
+      document.getElementById('checkout-order-items').innerHTML = itemsHTML;
+      document.getElementById('checkout-order-totals').innerHTML = `
+    <div class="os-row"><span>Subtotal</span><span>${fmtP(sub)}</span></div>
+    <div class="os-row"><span>Delivery</span><span>${delivery ? fmtP(delivery) : 'FREE'}</span></div>
+    <div class="os-row" style="color:var(--green)"><span>Discount (5%)</span><span>-${fmtP(disc)}</span></div>
+    <div class="os-row total"><span>Total</span><span>${fmtP(total)}</span></div>`;
+      const engItems = cart.filter(i => i.engraving);
+      const eEl = document.getElementById('checkout-engrave-items');
+      if (engItems.length) {
+        eEl.innerHTML = `<div style="background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:800;color:var(--purple-dark);margin-bottom:10px">✍️ Your Personalised Items</div>
+      ${engItems.map(item => { const p = PRODUCTS.find(x => x.id === item.id); return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px"><img src="${p.img}" style="width:36px;height:36px;object-fit:contain;border-radius:4px;background:#fff"><div><div style="font-weight:700">${p.name.substring(0, 30)}</div><div style="color:var(--purple)">Engraved: "${item.engraving.text}" · ${FONTS[item.engraving.fontIdx || 0].name} · +₹${ENGRAVE_CHARGE}</div></div></div>`; }).join('')}
+    </div>`;
+      } else eEl.innerHTML = '';
+      if (user) { document.getElementById('ch-fname').value = user.name.split(' ')[0] || ''; document.getElementById('ch-lname').value = user.name.split(' ').slice(1).join(' ') || ''; }
+    }
+
+    function placeOrder() {
+      if (!document.getElementById('ch-addr1').value || !document.getElementById('ch-city').value) { toast('⚠️ Please fill delivery address'); return; }
+      const orderId = 'SW' + Date.now().toString().slice(-8);
+      document.getElementById('order-id-display').textContent = 'Order #' + orderId;
+      const engItems = cart.filter(i => i.engraving);
+      const ne = document.getElementById('success-engrave-note');
+      if (engItems.length) {
+        ne.innerHTML = `<div style="background:var(--purple-light);border:1.5px solid var(--purple-border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;text-align:left;max-width:400px;margin:0 auto 16px">
+      <div style="font-weight:800;color:var(--purple-dark);margin-bottom:6px">✍️ Your Personalised Items</div>
+      ${engItems.map(item => { const p = PRODUCTS.find(x => x.id === item.id); return `<div style="color:var(--purple);font-size:12px;margin-bottom:3px">• ${p.name.substring(0, 28)} — "${item.engraving.text}"</div>`; }).join('')}
+    </div>`;
+      } else ne.innerHTML = '';
+      cart = []; saveCart(); toast('🎉 Order placed!'); showPage('success');
+    }
+
+    // ══════════════════════════════════════════
+    // PROFILE
+    // ══════════════════════════════════════════
+    function renderProfile() {
+      const el = document.getElementById('profile-content');
+      if (!user) {
+        el.innerHTML = `<div style="text-align:center;padding:70px 20px"><div style="font-size:64px;margin-bottom:16px">👤</div><h3 style="font-size:22px;font-weight:800;margin-bottom:8px">Sign in to your account</h3><p style="color:var(--text2);margin-bottom:20px">Access orders, wishlist and more.</p><button class="btn btn-primary" onclick="openModal('auth-modal')">Sign In</button></div>`;
+        return;
+      }
+      const init = user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const wishProds = wishlist.slice(0, 4).map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+      el.innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar">${init}</div>
+      <div><div class="profile-name">${user.name}</div><div class="profile-email">${user.email}</div><div class="profile-member">✅ Prime Member</div></div>
+      <button class="btn btn-sm" style="margin-left:auto;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15)" onclick="doLogout()">Sign Out</button>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-card">
+        <h3>📦 Recent Orders</h3>
+        ${[{ e: '📱', n: 'iPhone 15 Pro Max', d: 'Jun 1, 2025', s: 'delivered', eng: 'Rahul' },
+        { e: '💻', n: 'MacBook Air M3', d: 'May 20, 2025', s: 'delivered', eng: 'My MacBook' },
+        { e: '🎧', n: 'Sony WH-1000XM5', d: 'May 10, 2025', s: 'delivered', eng: null },
+        { e: '👟', n: 'Nike Air Max 270', d: 'Apr 28, 2025', s: 'transit', eng: null }
+        ].map(o => `<div class="order-row"><span class="order-emoji">${o.e}</span><div class="order-details"><div class="order-name">${o.n}${o.eng ? ` <span style="font-size:9px;background:var(--purple-light);color:var(--purple);padding:1px 5px;border-radius:6px;font-weight:700">✍️ "${o.eng}"</span>` : ''}</div><div class="order-meta">${o.d}</div></div><span class="order-status ${o.s}">${o.s === 'delivered' ? 'Delivered' : 'In Transit'}</span></div>`).join('')}
+      </div>
+      <div class="profile-card">
+        <h3>❤️ Wishlist (${wishlist.length})</h3>
+        ${wishProds.length ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${wishProds.map(p => `<div style="background:var(--surface);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:.15s;font-size:11px" onclick="openProduct(${p.id})"><img src="${p.img}" style="width:48px;height:48px;object-fit:contain;margin-bottom:3px" onerror="this.outerHTML='<div style=\\"font-size:28px\\">${p.emoji}</div>'"><div style="font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.name.substring(0, 18)}</div><div style="color:var(--red);font-weight:800;font-size:11px">${fmtP(p.price)}</div></div>`).join('')}</div>` : '<p style="color:var(--text2);font-size:12px">No items yet. ❤️ products to save.</p>'}
+      </div>
+      <div class="profile-card">
+        <h3>📍 Saved Addresses</h3>
+        <div style="font-size:12px;padding:10px;background:var(--surface);border-radius:var(--radius-sm);margin-bottom:8px">
+          <div style="font-weight:700;margin-bottom:3px">${user.name} <span style="background:var(--primary-light);color:var(--primary-dark);font-size:9px;padding:1px 6px;border-radius:8px;font-weight:800">DEFAULT</span></div>
+          <div style="color:var(--text2)">123 Sample Street, Mumbai, MH 400001</div>
+        </div>
+        <button class="btn btn-sm" style="background:var(--surface);color:var(--text);border:1.5px solid var(--border)">+ Add Address</button>
+      </div>
+      <div class="profile-card">
+        <h3>💳 Payment Methods</h3>
+        ${[{ i: '💳', l: 'HDFC Visa ····4242' }, { i: '📱', l: 'GPay — UPI linked' }, { i: '🏦', l: 'SBI Net Banking' }].map(m => `<div style="display:flex;align-items:center;gap:9px;font-size:12px;padding:8px;background:var(--surface);border-radius:var(--radius-sm);margin-bottom:6px"><span style="font-size:18px">${m.i}</span>${m.l}</div>`).join('')}
+      </div>
+    </div>`;
+    }
+
+    // ══════════════════════════════════════════
+    // AI RECOMMENDATIONS
+    // ══════════════════════════════════════════
+    async function loadAI() {
+      document.getElementById('ai-products').innerHTML = '<div class="ai-loading"><div class="spinner"></div><p>Getting your picks…</p></div>';
+      const pList = PRODUCTS.map(p => `${p.id}:${p.name}(${p.category},₹${p.price}${p.engravable ? ',engravable' : ''})`).join('; ');
+      const ctx = user ? `User: ${user.name}` : 'new visitor';
+      const cCtx = cart.length ? `Cart: ${cart.map(c => { const p = PRODUCTS.find(x => x.id === c.id); return p ? p.name : '' }).filter(Boolean).join(', ')}` : 'empty cart';
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 700, messages: [{ role: 'user', content: `You are ShopWave India AI. Context: ${ctx}, ${cCtx}.\nProducts: ${pList}\nPick 4 varied products. Short compelling reason max 8 words each.\nReturn ONLY valid JSON array: [{"id":number,"reason":"text"}]` }] }) });
+        const data = await res.json();
+        const text = data.content.map(i => i.text || '').join('').replace(/```json|```/g, '').trim();
+        const recs = JSON.parse(text);
+        document.getElementById('ai-products').innerHTML = recs.map(r => {
+          const p = PRODUCTS.find(x => x.id === r.id); if (!p) return '';
+          const disc = Math.round((1 - p.price / p.originalPrice) * 100);
+          return `<div class="ai-card" onclick="openProduct(${p.id})">
+        <img src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<div style=\\"font-size:38px;text-align:center;padding:14px\\">${p.emoji}</div>'">
+        <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${p.brand}</div>
+        <div style="font-size:12px;font-weight:800;line-height:1.3">${p.name}</div>
+        <span class="ai-reason">✨ ${r.reason}</span>
+        ${p.engravable ? '<span style="font-size:9px;color:var(--purple);background:var(--purple-light);padding:2px 6px;border-radius:6px;font-weight:800;border:1px solid var(--purple-border)">✍️ Engravable</span>' : ''}
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:15px;font-weight:900">${fmtP(p.price)}</span>
+          <span style="font-size:10px;color:var(--red);font-weight:700">-${disc}%</span>
+        </div>
+        <button class="atc-btn" style="font-size:11px;padding:6px" onclick="addToCart(event,${p.id})">Add to Cart</button>
+      </div>`;
+        }).join('');
+      } catch (e) {
+        // Fallback: show random 4 products
+        const fallback = PRODUCTS.sort(() => Math.random() - .5).slice(0, 4);
+        document.getElementById('ai-products').innerHTML = fallback.map(p => {
+          const disc = Math.round((1 - p.price / p.originalPrice) * 100);
+          return `<div class="ai-card" onclick="openProduct(${p.id})">
+        <img src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<div style=\\"font-size:38px;text-align:center;padding:14px\\">${p.emoji}</div>'">
+        <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase">${p.brand}</div>
+        <div style="font-size:12px;font-weight:800">${p.name}</div>
+        <span class="ai-reason">⭐ Top rated pick</span>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:15px;font-weight:900">${fmtP(p.price)}</span>
+          <span style="font-size:10px;color:var(--red);font-weight:700">-${disc}%</span>
+        </div>
+        <button class="atc-btn" style="font-size:11px;padding:6px" onclick="addToCart(event,${p.id})">Add to Cart</button>
+      </div>`;
+        }).join('');
+      }
+    }
+
+    // ══════════════════════════════════════════
+    // COUNTDOWN TIMER
+    // ══════════════════════════════════════════
+    let tEnd = Date.now() + 4 * 3600000 + 32 * 60000 + 10000;
+    setInterval(() => {
+      const d = Math.max(0, tEnd - Date.now());
+      const h = Math.floor(d / 3600000).toString().padStart(2, '0');
+      const m = Math.floor((d % 3600000) / 60000).toString().padStart(2, '0');
+      const s = Math.floor((d % 60000) / 1000).toString().padStart(2, '0');
+      const th = document.getElementById('t-h'), tm = document.getElementById('t-m'), ts = document.getElementById('t-s');
+      if (th) th.textContent = h; if (tm) tm.textContent = m; if (ts) ts.textContent = s;
+    }, 1000);
+
+    // ══════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════
+    updateAuthUI();
+    updateCartCount();
+    renderProducts();
+    loadAI();
+  </script>
+</body>
+
+</html>
