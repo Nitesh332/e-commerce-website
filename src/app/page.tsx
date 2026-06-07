@@ -1,12 +1,7 @@
 'use client';
 
-import { StoreProvider } from '@/lib/store';
-import ShopWaveApp from '@/components/ShopWaveApp';
+import ShopWaveUpdate from '@/components/ShopWaveUpdate/ShopWaveUpdate';
 
 export default function Home() {
-  return (
-    <StoreProvider>
-      <ShopWaveApp />
-    </StoreProvider>
-  );
+  return <ShopWaveUpdate />;
 }
